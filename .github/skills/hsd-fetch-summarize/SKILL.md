@@ -1,6 +1,6 @@
 ---
 name: hsd-fetch-summarize
-description: Fetch a single HSDES ticket by ID via the HSDES MCP and produce a structured FEV-aware summary.
+description: Fetch a single HSDES ticket by ID via the mcp-hsd MCP and produce a structured FEV-aware summary.
 ---
 
 # Skill: hsd-fetch-summarize
@@ -11,23 +11,46 @@ User supplies an HSD ID (e.g. `22019876543`) or pastes an HSDES URL, and wants t
 
 ## Inputs
 
-- `hsd_id` (required) — numeric or full URL.
+- `hsd_id` (required) — numeric ID or full HSDES URL. When a URL is supplied, the trailing
+  numeric segment is the ticket ID that must be used for `mcp_hsdes_*` calls.
 - `depth` (optional) — `summary` | `full` | `with-comments`. Default: `summary`.
+
+## Tool surface (mcp-hsd, 13 tools, prefix `mcp_hsdes_`)
+
+| Depth | Tool to call |
+|-------|--------------|
+| `summary` | `mcp_hsdes_get_hsd_article` (or `mcp_hsdes_summarize_hsd_article` for a server-side summary) |
+| `with-comments` | `mcp_hsdes_get_hsd_article_with_comments` |
+| `full` | `mcp_hsdes_get_hsd_article_full` (article + comments + attachments) |
+
+For structured field extraction, prefer the in-server AI skill
+`mcp_hsdes_skill_extract_fields` over manual regex.
 
 ## Procedure
 
-1. Ensure HSDES MCP tools are loaded. If not, request via `tool_search query="hsdes ticket fetch"`.
-2. Call the HSDES MCP fetch tool for `hsd_id`.
-3. If `depth = with-comments`, also pull comments/article history.
-4. Extract the canonical fields (see template below). Leave a field blank only if not present;
+1. Ensure mcp-hsd tools are loaded. If not, request via
+   `tool_search query="hsd article fetch search download"`.
+   If the call returns a 401/Negotiate failure, prompt the user to refresh Kerberos
+   (`kinit <idsid>@AMR.CORP.INTEL.COM` or `third_party/mcp-suite/tools/mcp-hsd/kinit_hsd.sh`).
+2. Normalize `hsd_id` before any MCP call:
+   - If the input is already numeric, use it as-is.
+   - If the input is an HSDES URL, extract the last contiguous digit run from the URL path or
+     fragment.
+   - Example: `https://hsdes.intel.com/appstore/article-one/#/14027842487` → `14027842487`.
+   - If no numeric ticket ID can be extracted, stop and ask for a valid HSD ID or HSDES URL.
+3. Call the matching `mcp_hsdes_get_hsd_article*` tool (per the table above) using only the
+   normalized numeric ticket ID. Optionally chain `mcp_hsdes_skill_extract_fields` to get the
+   canonical fields directly.
+4. If `depth = with-comments`, also pull comments via `mcp_hsdes_get_hsd_article_with_comments`.
+5. Extract the canonical fields (see template below). Leave a field blank only if not present;
    never invent.
-5. Heuristically extract **FEV signals** for downstream skills:
+6. Heuristically extract **FEV signals** for downstream skills:
    - Tool: Conformal | Formality (look for tokens `conformal`, `formality`, `lec_`, `fm_`).
    - Sub-flow / task name.
    - Tech / project tokens.
    - Error/violation signatures (lines that look like `ERROR:`, `non-equivalent`, `unmapped`,
      `compare point`, abort/assertion strings).
-6. Cite every quoted value with the source field name.
+7. Cite every quoted value with the source field name.
 
 ## Output template
 

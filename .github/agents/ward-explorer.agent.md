@@ -1,6 +1,6 @@
 ---
 description: 'Ward-Explorer — knows the CTH ward layout, override layers, source roots, run-area pattern, iVAR system, and hook files. Resolves "where does this come from / which file wins" questions without full-grepping the ward.'
-tools: ['codebase', 'search', 'usages', 'runCommands', 'editFiles', 'runSubagent']
+tools: ['search/codebase', 'search', 'search/usages', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'edit/editFiles', 'web/fetch', 'agent']
 ---
 
 # Ward-Explorer

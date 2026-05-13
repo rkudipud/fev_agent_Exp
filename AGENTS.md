@@ -34,6 +34,7 @@ from the Cheetah FEV wiki and the HSDES MCP wiki via the `wiki-jira-mcp` server.
 | Formality→Conformal Feedthru Conversion | <https://wiki.ith.intel.com/pages/viewpage.action?pageId=3771117942> | 3771117942 |
 | CTH2 Waiver Flow Cheatsheet | <https://wiki.ith.intel.com/display/cheetah/CTH2+Waiver+Flow+Cheatsheet> | — |
 | HSDES MCP guide | <https://wiki.ith.intel.com/spaces/ITScedf/pages/4705390469/HSDES+MCP> | 4705390469 |
+| mcp-hsd source (installed) | <https://github.com/intel-sandbox/mcp-suite/tree/master/tools/mcp-hsd> | — |
 
 Pluggable pointer list: [config/knowledge-base.yaml](config/knowledge-base.yaml). When the agent
 finds new pages worth remembering, it asks the user to append them there. Inside that file:

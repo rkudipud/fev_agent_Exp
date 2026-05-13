@@ -41,8 +41,11 @@ To extend: edit the YAML; no code change needed.
 ## Compact rendering
 
 ```
-HSDES MCP:    fetch by ID • search by keywords • list comments • related articles
-wiki-jira:    confluence_search/get_page/get_children • Jira search/read • widen with "search all spaces"
+HSD MCP (mcp-hsd, 13 tools): get_hsd_article{,_with_comments,_full,_images}
+                              summarize_hsd_article • search_hsd • run_saved_hsd_query
+                              download_hsd_{attachments,url}
+                              + AI skills: skill_{extract_fields,summarize,classify,root_cause}
+wiki-jira:    confluence_search/get_page/get_children • diff/history • "search all spaces" to widen
 Type "capabilities" for examples.
 ```
 

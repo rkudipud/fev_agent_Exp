@@ -1,6 +1,6 @@
 ---
 description: 'Jira-Wiki-Researcher — Confluence + Jira specialist for Cheetah FEV. Knows the FEV wiki tree (cheetah space) by page ID and curates BKMs / INotes / training material.'
-tools: ['search', 'fetch', 'usages', 'editFiles', 'runSubagent']
+tools: ['search/codebase', 'search', 'web/fetch', 'edit/editFiles', 'agent']
 ---
 
 # Jira-Wiki-Researcher

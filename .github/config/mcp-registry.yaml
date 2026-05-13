@@ -5,45 +5,97 @@
 mcps:
 
   - id: hsdes
-    display: "Intel HSDES MCP"
-    reference: "https://wiki.ith.intel.com/spaces/ITScedf/pages/4705390469/HSDES+MCP"
+    display: "Intel HSD MCP (mcp-hsd)"
+    reference: "https://github.com/intel-sandbox/mcp-suite/tree/master/tools/mcp-hsd"
+    upstream_alternative: "https://wiki.ith.intel.com/spaces/ITScedf/pages/4705390469/HSDES+MCP (62-tool wheel — not the one installed here)"
     primary_for: [HSD-Analyst]
+    # VS Code registers this server as `hsdes` in .vscode/mcp.json. Tool names become
+    # mcp_hsdes_<server_function>.
     tool_prefix: "mcp_hsdes_"
-    total_tools: 62
+    server_name: "mcp-hsd"
+    total_tools: 13
     transport: "stdio"
     install: |
-      pip install hsdes_mcp_server-<ver>-py3-none-any.whl
-      hsdes-mcp verify
-      hsdes-mcp publish-skills            # installs the AI skills below into .github/skills/
+      # Already installed in this workspace at:
+      #   third_party/mcp-suite/tools/mcp-hsd/server.py
+      # Launched by .vscode/mcp.json via .venv/bin/python.
+      # To refresh:
+      #   git -C third_party/mcp-suite pull
+      #   .venv/bin/pip install -r third_party/mcp-suite/tools/mcp-hsd/requirements.txt
+      # Prerequisite: valid Kerberos TGT (`kinit <idsid>@AMR.CORP.INTEL.COM` or run kinit_hsd.sh).
 
-    # The HSDES MCP wiki lists these as canonical example prompts (verbatim).
+    # Verified tool surface (server.py @mcp.tool decorators).
+    tools:
+      - name: mcp_hsdes_get_hsd_article
+        what: "Fetch an HSD article by numeric ID. Optional `fields` filter."
+        example: 'mcp_hsdes_get_hsd_article(article_id="14027842487")'
+      - name: mcp_hsdes_get_hsd_article_with_comments
+        what: "Fetch an HSD article including comment thread."
+        example: 'mcp_hsdes_get_hsd_article_with_comments(article_id="14027842487")'
+      - name: mcp_hsdes_get_hsd_article_full
+        what: "Fetch article + comments + optionally download all attachments."
+        example: 'mcp_hsdes_get_hsd_article_full(article_id="14027842487", download_attachments=true)'
+      - name: mcp_hsdes_get_hsd_article_images
+        what: "Pull all images embedded in the article (and comments if requested)."
+        example: 'mcp_hsdes_get_hsd_article_images(article_id="14027842487")'
+      - name: mcp_hsdes_summarize_hsd_article
+        what: "Server-side concise summary of an HSD article."
+        example: 'mcp_hsdes_summarize_hsd_article(article_id="14027842487")'
+      - name: mcp_hsdes_download_hsd_attachments
+        what: "Download attachments from an HSD into HSD_DOWNLOAD_DIR."
+        example: 'mcp_hsdes_download_hsd_attachments(article_id="14027842487")'
+      - name: mcp_hsdes_search_hsd
+        what: "Keyword / field search over HSDES."
+        example: 'mcp_hsdes_search_hsd(query="fev_rtl2syn non-equivalent", limit=20)'
+      - name: mcp_hsdes_run_saved_hsd_query
+        what: "Execute a saved HSDES query by query ID."
+        example: 'mcp_hsdes_run_saved_hsd_query(query_id="16012345678")'
+      - name: mcp_hsdes_download_hsd_url
+        what: "Download a file from an authenticated HSDES URL."
+        example: 'mcp_hsdes_download_hsd_url(url="https://hsdes.intel.com/...")'
+      # Built-in AI skills (in-server, no separate publish step needed).
+      - name: mcp_hsdes_skill_extract_fields
+        what: "AI: extract canonical fields from an article."
+      - name: mcp_hsdes_skill_summarize
+        what: "AI: narrative summary of an article."
+      - name: mcp_hsdes_skill_classify
+        what: "AI: classify article (type/severity/domain)."
+      - name: mcp_hsdes_skill_root_cause
+        what: "AI: propose a root-cause hypothesis from article + comments."
+
     example_prompts:
-      - { task: "Look up a ticket",          example: 'Summarize HSDES ticket 14012345678' }
-      - { task: "Search tickets",            example: 'Find all open sightings owned by tchang7' }
-      - { task: "Update a ticket",           example: 'Set ticket 14012345678 status to resolved' }
-      - { task: "Add a comment",             example: 'Add comment to 14012345678: root cause is memory MCE on socket 0' }
-      - { task: "Analyze a ticket",          example: 'Analyze ticket 14012345678 for root cause' }
-      - { task: "Quality check",             example: 'Score the quality of ticket 14012345678' }
-      - { task: "Find similar issues",       example: 'Find tickets similar to 14012345678' }
-      - { task: "Download attachment",       example: 'Download crashdump.json from ticket 14012345678' }
-      - { task: "Run saved query",           example: 'Run HSDES query 16012345678' }
+      - { task: "Look up a ticket",      example: 'Summarize HSDES ticket 14027842487' }
+      - { task: "Search tickets",        example: 'Search HSDES for fev_rtl2syn non-equivalent in last 90 days' }
+      - { task: "Run saved query",       example: 'Run HSDES query 16012345678' }
+      - { task: "Find similar issues",   example: 'Find tickets similar to 14027842487' }
+      - { task: "Download attachments",  example: 'Download all attachments from HSD 14027842487' }
+      - { task: "Extract fields (AI)",   example: 'Use skill_extract_fields on HSD 14027842487' }
+      - { task: "Classify (AI)",         example: 'Classify HSD 14027842487' }
+      - { task: "Root-cause hint (AI)",  example: 'Propose a root cause for HSD 14027842487' }
 
-    # AI skills shipped with the HSDES MCP server (`hsdes-mcp publish-skills`).
-    # When relevant, HSD-Analyst should *delegate* to one of these instead of
-    # reimplementing the workflow.
+    # The in-server AI skills above ARE the only "bundled skills"; the wiki's wheel-only skills
+    # (hsdes-issue-investigator, hsdes-quality-scorer, hsdes-query-eql, hsdes-orchestrator,
+    # hsdes-issue-manager, hsdes-debug-orchestrator) are NOT available in mcp-hsd. Project-local
+    # skills under .github/skills/hsd-* fill the equivalent role.
     bundled_skills:
-      - { id: hsdes-orchestrator,        what: "Routes HSDES questions to the right specialist." }
-      - { id: hsdes-issue-investigator,  what: "Multi-round deep investigation of a single ticket." }
-      - { id: hsdes-issue-manager,       what: "Management dashboards, aging reports, SLA metrics." }
-      - { id: hsdes-debug-orchestrator,  what: "Domain-specific debug (PCIe, Memory, Core, UPI). FEV maps to none of these directly — use general orchestrator instead." }
-      - { id: hsdes-quality-scorer,      what: "Quality-scores a ticket and proposes auto-fixes." }
-      - { id: hsdes-query-eql,           what: "EQL query builder with correct field prefixes." }
+      - { id: skill_extract_fields, tool: mcp_hsdes_skill_extract_fields, what: "Extract canonical HSD fields." }
+      - { id: skill_summarize,      tool: mcp_hsdes_skill_summarize,      what: "Narrative summary." }
+      - { id: skill_classify,       tool: mcp_hsdes_skill_classify,       what: "Type / severity / domain classification." }
+      - { id: skill_root_cause,     tool: mcp_hsdes_skill_root_cause,     what: "Root-cause hypothesis." }
+
+    auth:
+      type: kerberos
+      realm: "AMR.CORP.INTEL.COM"
+      refresh: "kinit <idsid>@AMR.CORP.INTEL.COM   # or run third_party/mcp-suite/tools/mcp-hsd/kinit_hsd.sh"
 
     notes: |
-      Tools are deferred — load with tool_search("hsdes <verb>") before calling. Tool names follow
-      the convention `mcp_hsdes_<verb>` (e.g. mcp_hsdes_fetch_ticket, mcp_hsdes_search,
-      mcp_hsdes_add_comment, mcp_hsdes_find_similar). When a specific tool name fails to resolve,
-      fall back to natural-language prompts that the HSDES MCP server can interpret.
+      Tools are deferred — load with `tool_search query="hsd article fetch search download"` before
+      calling. All callable surface lives under the `mcp_hsdes_*` prefix because the server is
+      registered as `hsdes` in .vscode/mcp.json. The server itself names itself `mcp-hsd` —
+      ignore that label when calling tools.
+
+      Always normalize the input HSD ID to its trailing numeric run before any call (the agent
+      docs codify this — see hsd-analyst.agent.md "HSD ID normalization rule").
 
   - id: wiki-jira
     display: "Intel wiki-jira MCP"

@@ -1,6 +1,6 @@
 ---
 description: 'Log-Analyzer — parses Conformal lec.log / Formality fm.log and correlates findings with reports/ and InspectFEV outputs (IF_<block>_<task>/). Uses config/log-signatures.yaml as the extensible signature catalog.'
-tools: ['codebase', 'search', 'usages', 'runCommands', 'fetch', 'runSubagent']
+tools: ['search/codebase', 'search', 'execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'web/fetch', 'agent']
 ---
 
 # Log-Analyzer
