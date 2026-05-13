@@ -1,0 +1,178 @@
+# ward-paths.yaml
+# Pluggable description of the CTH ward layout for FEV. All facts below were verified against the
+# Cheetah FEV wiki (see AGENTS.md). Extend the `terminology:` section as the user teaches the agent
+# project-specific terms.
+
+# --------------------------- Override layers ---------------------------
+# Most-specific first. The first existing copy of a file wins at runtime.
+# The wiki phrasing is "design_class/project and user layer"; addon == design_class.
+override_layers:
+  - user
+  - project
+  - addon          # a.k.a. design_class — same slot in the override stack
+  - tech
+  - global
+
+# --------------------------- Source-code roots ---------------------------
+source_roots:
+  conformal: "$ward/<layer>/cdns/fev_conformal"        # Cadence Conformal LEC
+  formality: "$ward/<layer>/snps/fev_formality"        # Synopsys Formality
+
+# Notable source-code files (relative to the chosen <layer>):
+source_files:
+  conformal:
+    vars:            "cdns/fev_conformal/vars.tcl"
+    default_procs:   "cdns/fev_conformal/default_procs.tcl"
+    promote:         "cdns/fev_conformal/promote.tcl"
+  formality:
+    vars:            "snps/fev_formality/vars.tcl"
+    default_procs:   "snps/fev_formality/default_fm_procs.tcl"
+    promote:         "snps/fev_formality/promote.tcl"
+  intel:
+    inspectFEV:      "intel/inspect_fev/inspectFEV.tcl"
+    threshold_cfg:   "common/threshold_cfg/"           # threshold_fev*.csv lives here
+
+# --------------------------- Run-area pattern (note PLURAL 'runs') ---------------------------
+run_area:
+  pattern: "$ward/runs/$block/$tech/$flow/$task"
+
+  flows:
+    - fev_conformal
+    - fev_formality
+
+  # Canonical task names (verified from the wiki).
+  tasks:
+    fev_conformal:
+      rtl2gate:
+        - fev_rtl2syn
+        - fev_rtl2apr
+        - fev_rtl2flp
+        - fev_fcl
+        - fev_rtl2syn_quick_febe
+        - fev_rtl2syn_full_febe
+        - fev_rtl2map
+      gate2gate:
+        - fev_map2syn
+        - fev_syn2apr
+        - fev_syn2apr_cdns
+      rtl2rtl:
+        - fev_rtl2rtl
+        - fev_sim2syn
+        - fev_lite
+        - fev_hier2flat_upf
+        - fev_ctechverif
+      eco:
+        - eco
+        - eco_verify
+    fev_formality:
+      rtl2gate:
+        - fev_fm_rtl2syn
+        - fev_fm_rtl2apr
+        - fev_fm_rtl2logicopto
+        - fev_fm_fcl
+        - fev_fm_quick_febe
+        - fev_fm_full_febe
+      rtl2rtl:
+        - fev_fm_rtl2rtl
+        - fev_fm_lite
+        - fev_fm_sim2syn
+        - fev_fm_ctechverif
+        - fev_fm_hier2flat_upf
+      gate2gate:
+        - fev_fm_syn2apr
+      eco: []
+
+  # Canonical artifact names within a run-area (relative paths).
+  artifacts:
+    common:
+      logs_dir:      "logs/"
+      reports_dir:   "reports/"
+      scripts_dir:   "scripts/"           # user hooks + user_procs.tcl live here
+    conformal:
+      log:           "logs/lec.log"
+      log_archive:   "logs/<task>_lec.log.<timestamp>"
+      report_dir:    "reports/"
+      hook_files:
+        - fev_setup_commands.tcl
+        - fev_pre_lib.tcl
+        - fev_pre_read_upf.tcl
+        - fev_post_read_upf.tcl
+        - fev_post_setup.tcl
+        - fev_mapping.tcl
+        - fev_pre_flatcompare.tcl
+        - fev_post_compare.tcl
+      proc_override: "scripts/user_procs.tcl"
+    formality:
+      log:           "logs/fm.log"
+      log_archive:   "logs/<task>_fm.log.<timestamp>"
+      report_dir:    "reports/"
+      hook_files:
+        - fev_fm_pre_read_lib.tcl
+        - fev_fm_pre_read_design.tcl
+        - fev_fm_post_read_upf.tcl
+        - fev_fm_post_setup.tcl
+        - fev_fm_pre_compare.tcl
+        - user_fm_vclp_waivers.tcl
+        - fev_fm_post_compare.tcl
+      proc_override: "scripts/user_fm_procs.tcl"
+
+  # InspectFEV audit output (created at PWD, not inside the run-area).
+  inspect_fev:
+    dir_pattern:  "IF_<block>_<task>/"
+    log:          "logs/InspectFEV.log"
+    violations:   "outputs/violation_rpts/"
+    indicators:   "outputs/InspectFEV_indicator_stats.txt"
+    violations_xml: "outputs/<block>.<task>.violations.xml"
+    summary_pre:  "results/InspectFEV_SUMMARY.rpt"
+    summary_post: "results/Greenstone_summary.rpt"
+    greenstone:   "greenstone.csh"
+
+# --------------------------- Release / collateral pointers ---------------------------
+# Standard input collaterals consumed by the templates (verified from the wiki).
+release_collaterals:
+  base: "$env(ward)/runs/$block/$env(tech)/release/$env(tag)"
+  paths:
+    rtl_list_2stage:  "fe_collateral/rtl_list_2stage.tcl"
+    golden_upf:       "fe_collateral/$ivar(design_name).upf"
+    revised_netlist:  "finish/$ivar(design_name).pt.v"
+    revised_upf_apr:  "fe_collateral/$ivar(design_name).upf"
+    vsdc_conformal:   "finish/$ivar(design_name).vsdc"
+    svf_formality:    "finish/$ivar(design_name).svf"
+    syn_netlist:      "compile_initial_opto/$ivar(design_name).pt.v"
+    syn_upf:          "compile_initial_opto/$ivar(design_name).upf"
+
+# --------------------------- DTA shell switches ---------------------------
+shells:
+  conformal_fev:  { exe: Ifev_shell,    eco: false, options: ['-T task', '-B build_dir', '-D design', '-R run_dir', '-G tag', '-X tech', '-A promote', '-prepare', '-O overwrite', '-skipaudit', '-reuse_sif', '-nogreenstone_mode'] }
+  conformal_eco:  { exe: Ieco_shell,    eco: true,  options: ['-T task', '-B build_dir', '-D design', '-R run_dir', '-G tag', '-X tech', '-prepare', '-O overwrite', '-reuse_sif', '-eco_type'] }
+  formality_fev:  { exe: Ifev_fm_shell, eco: false, options: ['-T task', '-B build_dir', '-D design', '-R run_dir', '-G tag', '-X tech', '-A promote', '-prepare', '-stp', '-no_generate_csh', '-O overwrite', '-skipaudit', '-reuse_sif', '-nogreenstone_mode'] }
+  formality_eco:  { exe: Ieco_fm_shell, eco: true,  options: ['-T task', '-B build_dir', '-D design', '-R run_dir', '-G tag', '-X tech', '-prepare', '-O overwrite', '-reuse_sif', '-eco_type'] }
+  flow_tracer_gui: 'eouMGR --block <BLOCK> --design <DESIGN> --flow <fev_stack> --gui &'
+  milestone_check: 'eouMGR --block <BLOCK> --checker --flow fev --threshold_config <csv> --milestone 0p3'
+
+# --------------------------- Glossary (extend as you learn) ---------------------------
+terminology:
+  ward:        "User's working copy of CTH-managed source. Root variable: $ward."
+  block:       "Block / build name. -B switch on the shells. Synonym for build_name."
+  task:        "FEV task. -T switch. e.g. fev_rtl2syn, fev_fm_rtl2rtl, eco."
+  tech:        "Tech node. -X switch. e.g. p1276."
+  tag:         "Release tag. -G switch. Latest tag is the default for promote."
+  flow:        "Top-level tool flow under a run-area: fev_conformal or fev_formality."
+  layer:       "One of [user, project, addon, tech, global] in the CTH override stack."
+  addon:       "Synonym for design_class. Where project-wide ivars get set."
+  bscript_dir: "ivar(bscript_dir) — central area where archived per-task scripts/waivers live."
+  ivar:        "Tcl array used as the iVAR knob set. e.g. ivar($task,rtl_list_golden)."
+  guidance_file: "Conformal vsdc / Formality svf — synthesis guidance."
+  hooks:       "8 optional Tcl files under <run_area>/scripts/ to inject tool commands without forking the template."
+  IF_dir:      "IF_<block>_<task>/ — InspectFEV output directory created at PWD."
+  greenstone:  "GUI for waivers. Invoked via 'source greenstone.csh'."
+  cth_waiver:  "Cheetah waiver / sign-off flow. eouMGR --checker invokes it."
+  # Add team-specific terms here, e.g.:
+  # design_class: "<your project's class name(s)>"
+
+# --------------------------- Conventions ---------------------------
+conventions:
+  never_full_grep: true       # never recurse the whole ward
+  ask_before_guess: true      # ask once, then persist via terminology:
+  resolution_order: top_down  # most-specific layer first
+  hook_first: true            # prefer hook-file additions over editing default_procs.tcl

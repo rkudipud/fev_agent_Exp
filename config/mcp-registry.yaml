@@ -1,0 +1,107 @@
+# mcp-registry.yaml
+# Pluggable list of MCPs the FEV agent knows about. Sourced from live wikis (see
+# AGENTS.md for the page references). To register a new MCP, append an entry here.
+
+mcps:
+
+  - id: hsdes
+    display: "Intel HSDES MCP"
+    reference: "https://wiki.ith.intel.com/spaces/ITScedf/pages/4705390469/HSDES+MCP"
+    primary_for: [HSD-Analyst]
+    tool_prefix: "mcp_hsdes_"
+    total_tools: 62
+    transport: "stdio"
+    install: |
+      pip install hsdes_mcp_server-<ver>-py3-none-any.whl
+      hsdes-mcp verify
+      hsdes-mcp publish-skills            # installs the AI skills below into .github/skills/
+
+    # The HSDES MCP wiki lists these as canonical example prompts (verbatim).
+    example_prompts:
+      - { task: "Look up a ticket",          example: 'Summarize HSDES ticket 14012345678' }
+      - { task: "Search tickets",            example: 'Find all open sightings owned by tchang7' }
+      - { task: "Update a ticket",           example: 'Set ticket 14012345678 status to resolved' }
+      - { task: "Add a comment",             example: 'Add comment to 14012345678: root cause is memory MCE on socket 0' }
+      - { task: "Analyze a ticket",          example: 'Analyze ticket 14012345678 for root cause' }
+      - { task: "Quality check",             example: 'Score the quality of ticket 14012345678' }
+      - { task: "Find similar issues",       example: 'Find tickets similar to 14012345678' }
+      - { task: "Download attachment",       example: 'Download crashdump.json from ticket 14012345678' }
+      - { task: "Run saved query",           example: 'Run HSDES query 16012345678' }
+
+    # AI skills shipped with the HSDES MCP server (`hsdes-mcp publish-skills`).
+    # When relevant, HSD-Analyst should *delegate* to one of these instead of
+    # reimplementing the workflow.
+    bundled_skills:
+      - { id: hsdes-orchestrator,        what: "Routes HSDES questions to the right specialist." }
+      - { id: hsdes-issue-investigator,  what: "Multi-round deep investigation of a single ticket." }
+      - { id: hsdes-issue-manager,       what: "Management dashboards, aging reports, SLA metrics." }
+      - { id: hsdes-debug-orchestrator,  what: "Domain-specific debug (PCIe, Memory, Core, UPI). FEV maps to none of these directly — use general orchestrator instead." }
+      - { id: hsdes-quality-scorer,      what: "Quality-scores a ticket and proposes auto-fixes." }
+      - { id: hsdes-query-eql,           what: "EQL query builder with correct field prefixes." }
+
+    notes: |
+      Tools are deferred — load with tool_search("hsdes <verb>") before calling. Tool names follow
+      the convention `mcp_hsdes_<verb>` (e.g. mcp_hsdes_fetch_ticket, mcp_hsdes_search,
+      mcp_hsdes_add_comment, mcp_hsdes_find_similar). When a specific tool name fails to resolve,
+      fall back to natural-language prompts that the HSDES MCP server can interpret.
+
+  - id: wiki-jira
+    display: "Intel wiki-jira MCP"
+    reference: "Confluence (wiki.ith.intel.com) + Intel Jira via the wiki-jira-mcp server"
+    primary_for: [Jira-Wiki-Researcher]
+    tool_prefix: "mcp_wiki-jira-mcp_"
+
+    default_spaces:
+      # Default Confluence search scope used by this workspace's wiki-jira MCP config.
+      - { key: oksdebug,    purpose: "Platform SysDebug handbook (not FEV-primary)." }
+      - { key: fvcommon,    purpose: "FVCommon — reset/PythonSV BKMs (not FEV-primary)." }
+      - { key: SIPGSLD,     purpose: "SIPG System Level Debug (not FEV-primary)." }
+      - { key: XPIVSHCoVal, purpose: "Team DPMO/GNR space (not FEV-primary)." }
+
+    fev_scope:
+      # Spaces the FEV agent should add to every Confluence search.
+      - key: cheetah
+        display: "Cheetah / FEV root"
+        root_url: "https://wiki.ith.intel.com/display/cheetah/FEV"
+        root_page_id: "2288898439"
+
+    # Verified tool names exposed by the wiki-jira MCP in this workspace.
+    tools:
+      - name: mcp_wiki-jira-mcp_confluence_search
+        what: "Search Confluence in default spaces (or override via spaces_filter)."
+        example: 'confluence_search query="FEV blackbox modeling BKM" spaces_filter="cheetah"'
+      - name: mcp_wiki-jira-mcp_confluence_get_page
+        what: "Fetch a Confluence page by ID or by (space_key, title)."
+        example: 'confluence_get_page page_id="2288898439"'
+      - name: mcp_wiki-jira-mcp_confluence_get_page_children
+        what: "List/inspect children of a page; can include rendered content."
+        example: 'confluence_get_page_children parent_id="2376013930" include_content=true'
+      - name: mcp_wiki-jira-mcp_confluence_get_space_page_tree
+        what: "Flat hierarchy of an entire space — useful for orientation."
+        example: 'confluence_get_space_page_tree space_key="cheetah" limit=200'
+      - name: mcp_wiki-jira-mcp_confluence_get_comments
+        what: "Comments on a page."
+        example: 'confluence_get_comments page_id="2288898444"'
+      - name: mcp_wiki-jira-mcp_confluence_get_page_history
+        what: "Fetch an older version of a page."
+        example: 'confluence_get_page_history page_id="..." version=3'
+      - name: mcp_wiki-jira-mcp_confluence_get_page_diff
+        what: "Unified diff between two versions of a page (useful for BKM changes)."
+        example: 'confluence_get_page_diff page_id="..." from_version=10 to_version=11'
+      - name: mcp_wiki-jira-mcp_confluence_get_attachments
+        what: "List attachments on a page."
+      - name: mcp_wiki-jira-mcp_confluence_download_attachment
+        what: "Download one attachment by ID."
+      - name: mcp_wiki-jira-mcp_confluence_download_content_attachments
+        what: "Download all attachments on a page."
+      - name: mcp_wiki-jira-mcp_confluence_get_page_images
+        what: "Fetch embedded images on a page."
+      - name: mcp_wiki-jira-mcp_confluence_get_labels
+        what: "Page labels (use to filter BKM-tagged pages)."
+
+    widen_phrases:
+      - "search all spaces"
+      - "search the whole wiki"
+    widen_action: 'set spaces_filter="" on confluence_search'
+
+# Add new MCPs below following the same schema.

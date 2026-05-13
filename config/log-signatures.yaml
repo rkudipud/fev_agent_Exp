@@ -1,0 +1,86 @@
+# log-signatures.yaml
+# Catalog of FEV log signatures used by fev-log-analysis. Seeded from observed Conformal/Formality
+# behavior. EXTEND over time — Log-Analyzer proposes catalog candidates whenever it sees an unknown
+# important line.
+
+conformal:
+  log_file: "logs/lec.log"
+  archive_glob: "logs/<task>_lec.log.<timestamp>"
+  banner_patterns:
+    - "Conformal"
+    - "Cadence Conformal"
+    - "LEC>"
+    - "lec_64"
+
+  milestones:
+    - { id: setup_loaded,        pattern: "Reading setup|read setup|setup file loaded", meaning: "Setup file / dofile loaded." }
+    - { id: lib_read,            pattern: "Reading library|read_library",                meaning: "Standard cell / HIP libraries read." }
+    - { id: golden_read,         pattern: "Read.*golden|set_root_module.*-Golden",       meaning: "Golden side designs read." }
+    - { id: revised_read,        pattern: "Read.*revised|set_root_module.*-Revised",     meaning: "Revised side designs read." }
+    - { id: upf_read,            pattern: "read_upf|read_power_intent",                  meaning: "UPF / power intent read." }
+    - { id: modeling_done,       pattern: "modeling complete|set_flatten_model|set_analyze_option", meaning: "Modeling stage complete." }
+    - { id: mapping_done,        pattern: "map_key_points|Mapping complete|Mapping summary", meaning: "Key-point mapping done." }
+    - { id: compare_started,     pattern: "add_compared_points|compare -threading|compare started", meaning: "Compare started." }
+    - { id: compare_done,        pattern: "report_compare_data|Equivalence Checking Complete|compare finished", meaning: "Compare stage complete." }
+    - { id: hier_compare_done,   pattern: "hier_compare|Hierarchical compare summary",   meaning: "Hierarchical compare summary." }
+
+  errors:
+    - { id: non_equiv,           pattern: "Non-equivalent|non-equiv|NEQ\\b",              meaning: "One or more compare points are non-equivalent." }
+    - { id: unmapped,            pattern: "unmapped|Unmapped points",                     meaning: "Unmapped compare points exist — mapping incomplete." }
+    - { id: abort,               pattern: "ABORT\\b|aborted point|aborted compare",       meaning: "Compare aborted (resource/heuristic limit)." }
+    - { id: not_compared,        pattern: "not compared|Not Compared",                    meaning: "Points not compared." }
+    - { id: blackbox_missing,    pattern: "blackbox.*missing|module.*not found",          meaning: "Blackbox / missing module — check ivar($task,$block,black_box) and child_modules." }
+    - { id: lib_missing,         pattern: "library.*not found|cannot find library",       meaning: "Library missing — check prepare_hip / read_stdcell_libs." }
+    - { id: parse_error,         pattern: "syntax error|parse error|cannot.*parse",       meaning: "RTL / netlist parse error." }
+
+  correlations:
+    compare_done:      "reports/ (final compare report)"
+    non_equiv:         "reports/ + InspectFEV violation_rpts/"
+    unmapped:          "reports/ + InspectFEV violation_rpts/"
+    mapping_done:      "reports/ (mapping summary)"
+    hier_compare_done: "reports/ (hier compare summary)"
+
+formality:
+  log_file: "logs/fm.log"
+  archive_glob: "logs/<task>_fm.log.<timestamp>"
+  banner_patterns:
+    - "Formality"
+    - "Synopsys Formality"
+    - "fm_shell"
+
+  milestones:
+    - { id: setup_loaded,        pattern: "source.*setup|read.*setup",                         meaning: "Setup / reference loaded." }
+    - { id: lib_read,            pattern: "read_db|read_lib",                                  meaning: "Libraries read." }
+    - { id: ref_read,            pattern: "read_verilog -r|read.*-container r",                meaning: "Reference (golden) read." }
+    - { id: impl_read,           pattern: "read_verilog -i|read.*-container i",                meaning: "Implementation (revised) read." }
+    - { id: upf_read,            pattern: "load_upf|read_upf",                                 meaning: "UPF read." }
+    - { id: svf_read,            pattern: "set_svf|guide_environment",                         meaning: "SVF guidance loaded." }
+    - { id: match_done,          pattern: "match\\b|matching complete|matched .* points",     meaning: "Matching done." }
+    - { id: verify_done,         pattern: "verify\\b|Verification SUCCEEDED|Verification FAILED", meaning: "Verification complete." }
+
+  errors:
+    - { id: failed_points,       pattern: "Failing points|Verification FAILED|Failed Points", meaning: "One or more compare points failed." }
+    - { id: unmatched,           pattern: "Unmatched|unmatched points",                       meaning: "Unmatched points present." }
+    - { id: aborted_points,      pattern: "Aborted points|aborted",                           meaning: "Aborted compare points." }
+    - { id: blackbox_missing,    pattern: "blackbox.*missing|cannot resolve reference",       meaning: "Blackbox / missing reference — check child_modules + black_box ivars." }
+    - { id: parse_error,         pattern: "Syntax error|parse error",                         meaning: "Parse error in RTL/netlist." }
+    - { id: lib_missing,         pattern: "library not found|cannot find library",            meaning: "Library missing — check read_stdcell_libs / prepare_hip." }
+
+  correlations:
+    verify_done:    "reports/ + fm.log tail"
+    failed_points:  "reports/ (Failing section) + InspectFEV violation_rpts/"
+    unmatched:      "reports/ (Unmatched section) + InspectFEV violation_rpts/"
+    aborted_points: "reports/ (Aborted section)"
+
+# --------------------------- InspectFEV outputs ---------------------------
+# Where to look for post-run audit findings (created at PWD as IF_<block>_<task>/).
+inspect_fev:
+  pre_waiver_summary:  "results/InspectFEV_SUMMARY.rpt"
+  post_waiver_summary: "results/Greenstone_summary.rpt"
+  violations_dir:      "outputs/violation_rpts/"
+  violations_xml:      "outputs/<block>.<task>.violations.xml"
+  indicator_stats:     "outputs/InspectFEV_indicator_stats.txt"
+  log:                 "logs/InspectFEV.log"
+
+# Add new entries below following the same schema. When Log-Analyzer proposes a candidate, paste
+# its block (`tool`, `kind`, `id`, `pattern`, `meaning`, `correlates`) into the right section.

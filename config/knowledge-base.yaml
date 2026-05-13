@@ -1,0 +1,413 @@
+# knowledge-base.yaml
+# Curated, wiki-sourced index of authoritative pages the FEV agent should consult and cite.
+# All entries below were verified live via the wiki-jira MCP. Append project-specific pages over
+# time — the Jira-Wiki-Researcher will prompt the user to do so when it finds useful new pages.
+
+confluence:
+
+  preferred_spaces:
+    - id: cheetah
+      display: "Cheetah (CTH) / FEV root"
+      root_url: "https://wiki.ith.intel.com/display/cheetah/FEV"
+      root_page_id: "2288898439"
+    # Add project-specific spaces here, e.g.:
+    # - id: <space-key>
+    #   display: "<team / project>"
+    #   root_url: "<https://...>"
+
+  curated_pages:
+
+    # ============================== Flow roots ==============================
+    - title: "FEV"
+      page_id: "2288898439"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV"
+      tags: [root, fev, cth]
+      summary: "FEV (Formal Equivalence Verification) flow root. Indexes Conformal + Formality variants and ECO, BKMs, Training links."
+
+    - title: "FEV_CONFORMAL"
+      page_id: "2376013930"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL"
+      tags: [flow, conformal, fev]
+      tool: conformal
+      summary: "Authoritative Conformal flow page: tasks (rtl2syn, rtl2apr, rtl2rtl, sim2syn, lite, hier2flat_upf, ctechverif, syn2apr, map2syn, …), iVARs, hook files, run-area paths, DTA shell (Ifev_shell), promote, milestone check."
+
+    - title: "FEV_FORMALITY"
+      page_id: "2376013928"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_FORMALITY"
+      tags: [flow, formality, fev]
+      tool: formality
+      summary: "Authoritative Formality flow page: tasks (fev_fm_rtl2syn, fev_fm_rtl2apr, fev_fm_rtl2rtl, fev_fm_sim2syn, fev_fm_lite, fev_fm_syn2apr, …), iVARs, hook files, DTA shell (Ifev_fm_shell), STP packaging."
+
+    # ============================== BKMs ==============================
+    - title: "FEV_CONFORMAL BKMs"
+      page_id: "2288898444"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL+BKMs"
+      tags: [bkm, conformal]
+      tool: conformal
+      summary: "Conformal best-known methods."
+
+    - title: "FEV_FORMALITY BKMs"
+      page_id: "2967972768"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_FORMALITY+BKMs"
+      tags: [bkm, formality]
+      tool: formality
+      summary: "Formality best-known methods."
+
+    # ============================== ECO ==============================
+    - title: "FEV_CONFORMAL ECO"
+      page_id: "2288898442"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL+ECO"
+      tags: [eco, conformal]
+      tool: conformal
+
+    - title: "FEV_FORMALITY ECO"
+      page_id: "2376014240"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_FORMALITY+ECO"
+      tags: [eco, formality]
+      tool: formality
+
+    # ============================== Paranoia / signoff ==============================
+    - title: "FEV_CONFORMAL Paranoia"
+      page_id: "2288898447"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL+Paranoia"
+      tags: [paranoia, signoff, conformal]
+      tool: conformal
+
+    - title: "FEV_Formality Signoff and Paranoia runs"
+      page_id: "2799577214"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2799577214"
+      tags: [paranoia, signoff, formality]
+      tool: formality
+
+    # ============================== Debug / audit ==============================
+    - title: "debugFEV"
+      page_id: "2591606319"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2591606319"
+      tags: [debug, conformal, formality]
+      summary: "Active debug guide. Versioned and frequently updated."
+
+    - title: "InspectFEV"
+      page_id: "2716142730"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2716142730"
+      tags: [audit, inspectfev, signoff]
+      summary: "Cheetah-independent audit tool. Creates IF_<block>_<task>/ with violation_rpts, indicator_stats, violations.xml, InspectFEV_SUMMARY.rpt, Greenstone_summary.rpt, greenstone.csh."
+
+    - title: "FEV Indicators"
+      page_id: "4112071888"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4112071888"
+      tags: [indicators, metrics, audit]
+
+    # ============================== Sub-flows / utilities ==============================
+    - title: "RTL2RTL FEV Utility"
+      page_id: "2602665916"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2602665916"
+      tags: [rtl2rtl, utility]
+
+    - title: "sim2syn FEV"
+      page_id: "3003274855"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3003274855"
+      tags: [sim2syn, rtl2rtl]
+
+    - title: "Deleted Sequentials flow"
+      page_id: "2798153420"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2798153420"
+      tags: [deleted-sequentials]
+
+    - title: "Compare Recipe Finder"
+      page_id: "3205930885"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3205930885"
+      tags: [compare, recipe, mapping]
+
+    - title: "FEV CONFORMAL ANALYZER"
+      page_id: "2602671432"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2602671432"
+      tags: [analyzer, conformal]
+
+    - title: "CLP - Conformal Low Power"
+      page_id: "3413688249"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3413688249"
+      tags: [clp, low-power, conformal]
+      tool: conformal
+
+    - title: "FEV_LITE in Formality"
+      page_id: "3518272648"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3518272648"
+      tags: [fev-lite, formality]
+      tool: formality
+
+    - title: "FEV_CONFORMAL Testcase Extraction"
+      page_id: "2579192892"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2579192892"
+      tags: [testcase, packing, conformal]
+
+    - title: "Formality to Conformal Feedthru Conversion"
+      page_id: "3771117942"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3771117942"
+      tags: [feedthrough, conversion]
+
+    - title: "Feedthrough Cross Check"
+      page_id: "4172208888"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4172208888"
+      tags: [feedthrough]
+
+    # ============================== Training ==============================
+    - title: "FEV_CONFORMAL Training"
+      page_id: "2397482922"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL+Training"
+      tags: [training, conformal]
+
+    - title: "FEV_FORMALITY Training"
+      page_id: "2517804040"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV_FORMALITY+Training"
+      tags: [training, formality]
+
+    - title: "FEV_CONFORMAL Getting Started"
+      page_id: "2349042456"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2349042456"
+      tags: [getting-started, conformal]
+
+    - title: "FEV_Formality Getting Started"
+      page_id: "2364132350"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2364132350"
+      tags: [getting-started, formality]
+
+    # ============================== Release ==============================
+    - title: "FEV Release Notes"
+      page_id: "3086369633"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV+Release+Notes"
+      tags: [release-notes]
+
+    - title: "FEV Archive"
+      page_id: "4172208873"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4172208873"
+      tags: [archive]
+
+    # ============================== Cross-flow ==============================
+    - title: "CTH2 Waiver Flow Cheatsheet"
+      url: "https://wiki.ith.intel.com/display/cheetah/CTH2+Waiver+Flow+Cheatsheet"
+      tags: [waiver, signoff, cth]
+
+    - title: "FlowTracer User Guide"
+      url: "https://wiki.ith.intel.com/display/cheetah/FlowTracer+User+Guide"
+      tags: [flowtracer, gui]
+
+    - title: "REGRESSION_FRAMEWORKS"
+      page_id: "2584533808"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2584533808"
+      tags: [regression]
+
+    - title: "FEV Infrastructure"
+      page_id: "3271276763"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3271276763"
+      tags: [infrastructure]
+      summary: "Direct child of FEV root — owns FEV tooling/release infrastructure."
+
+    - title: "FEV Formality Manually Added Feedthrough Commands"
+      page_id: "3166898902"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3166898902"
+      tags: [feedthrough, formality]
+      tool: formality
+
+    - title: "FEV_CONFORMAL - Coverage"
+      page_id: "2624106523"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2624106523"
+      tags: [coverage, conformal]
+      tool: conformal
+
+  # ==========================================================================
+  # Wiki hierarchy — verified via wiki-jira MCP. Edit/extend over time. The
+  # Jira-Wiki-Researcher uses this as a fast-path before falling back to search.
+  # Top-of-tree: cheetah space — "FEV" (page 2288898439).
+  # ==========================================================================
+  fev_root_tree:
+    root:
+      title: "FEV"
+      page_id: "2288898439"
+      url: "https://wiki.ith.intel.com/display/cheetah/FEV"
+    children:
+      - { title: "FEV_CONFORMAL",        page_id: "2376013930", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013930", last_seen_version: 37, last_updated: "2025-11-23" }
+      - { title: "FEV_FORMALITY",        page_id: "2376013928", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013928", last_seen_version: 30, last_updated: "2024-07-25" }
+      - { title: "InspectFEV",           page_id: "2716142730", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2716142730", last_seen_version: 31, last_updated: "2024-11-21" }
+      - { title: "REGRESSION_FRAMEWORKS",page_id: "2584533808", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2584533808", last_seen_version: 8,  last_updated: "2023-05-30" }
+      - { title: "FEV Release Notes",    page_id: "3086369633", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3086369633", last_seen_version: 9,  last_updated: "2025-05-23" }
+      - { title: "FEV Infrastructure",   page_id: "3271276763", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3271276763", last_seen_version: 1,  last_updated: "2023-11-09" }
+      - { title: "Indicators",           page_id: "4112071888", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4112071888", last_seen_version: 16, last_updated: "2025-06-13" }
+      - { title: "Feedthrough Cross Check", page_id: "4172208888", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4172208888", last_seen_version: 13, last_updated: "2025-11-04" }
+      - { title: "FEV Archive",          page_id: "4172208873", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4172208873", last_seen_version: 1,  last_updated: "2025-05-23" }
+
+  fev_conformal_subtree:
+    root:
+      title: "FEV_CONFORMAL"
+      page_id: "2376013930"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013930"
+    children:
+      - { title: "FEV_CONFORMAL Getting Started",      page_id: "2349042456", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2349042456" }
+      - { title: "FEV_CONFORMAL ECO",                  page_id: "2288898442", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288898442" }
+      - { title: "FEV_CONFORMAL BKMs",                 page_id: "2288898444", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288898444" }
+      - { title: "FEV_CONFORMAL Paranoia",             page_id: "2288898447", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288898447" }
+      - { title: "FEV_CONFORMAL Training",             page_id: "2397482922", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2397482922" }
+      - { title: "FEV_CONFORMAL Testcase Extraction",  page_id: "2579192892", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2579192892" }
+      - { title: "debugFEV",                           page_id: "2591606319", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2591606319" }
+      - { title: "RTL2RTL FEV Utility",                page_id: "2602665916", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2602665916" }
+      - { title: "FEV CONFORMAL ANALYZER",             page_id: "2602671432", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2602671432" }
+      - { title: "FEV_CONFORMAL - Coverage",           page_id: "2624106523", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2624106523" }
+      - { title: "Deleted Sequentials flow",           page_id: "2798153420", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2798153420" }
+      - { title: "sim2syn FEV",                        page_id: "3003274855", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3003274855" }
+      - { title: "Compare Recipe Finder",              page_id: "3205930885", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3205930885" }
+      - { title: "CLP - Conformal Low Power",          page_id: "3413688249", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3413688249" }
+      - { title: "Formality to Conformal Feedthru Conversion", page_id: "3771117942", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3771117942" }
+
+  fev_formality_subtree:
+    root:
+      title: "FEV_FORMALITY"
+      page_id: "2376013928"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013928"
+    children:
+      - { title: "FEV_Formality Getting Started",                  page_id: "2364132350", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2364132350" }
+      - { title: "FEV_FORMALITY ECO",                              page_id: "2376014240", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376014240" }
+      - { title: "FEV_FORMALITY Training",                         page_id: "2517804040", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2517804040" }
+      - { title: "FEV_Formality Signoff and Paranoia runs",        page_id: "2799577214", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2799577214" }
+      - { title: "FEV Formality Manually Added Feedthrough Commands", page_id: "3166898902", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3166898902" }
+      - { title: "FEV_FORMALITY BKMs",                             page_id: "2967972768", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2967972768" }
+      - { title: "FEV_LITE in Formality",                          page_id: "3518272648", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3518272648" }
+
+  # ==========================================================================
+  # Cheetah2 — FEV-relevant pages outside the FEV sub-tree. These describe the
+  # platform FEV runs on (R2G releases, test waivers, BKM/FAQ, deployment).
+  # ==========================================================================
+  cheetah2_pages:
+
+    - title: "Cheetah2.0 FEV Flow"
+      page_id: "1918413058"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1918413058"
+      tags: [cheetah2, fev, legacy]
+      summary: "Historical Cheetah2 FEV flow page. Notes the canonical FEV pages have moved under cheetah/FEV (page 2288898439)."
+
+    - title: "Cheetah2 FE RTL2RTL FEV"
+      page_id: "2093618547"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2093618547"
+      tags: [cheetah2, rtl2rtl, fev]
+      tool: conformal
+      summary: "Cheetah2 FE RTL2RTL FEV application note — shows expected InspectFEV final status output."
+
+    - title: "FEV Cheetah Flow BKM/FAQs"
+      page_id: "2288658823"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288658823"
+      tags: [cheetah2, bkm, faq]
+      summary: "Cross-link to Cheetah BKMs (up to CTH 2021.06.SP1) + FEV BKMs review. Mentions goto/fev_genesis and the Cheetah FEV training video."
+
+    - title: "Cheetah2 : SOC DESIGN METHODOLOGY & BKMs"
+      page_id: "1631817659"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1631817659"
+      tags: [cheetah2, methodology, bkm, soc]
+      summary: "Cheetah2 FE R2G flow for QOR + FEV signoff. Top-Down partition filelist generation for FEV."
+
+    - title: "Filelist delivery in Cheetah2-FE to Cheetah2-R2G"
+      page_id: "1594791375"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1594791375"
+      tags: [cheetah2, filelist, fev]
+      summary: "SYN / FEV / VCS filelist split. FEV (rtl2syn) uses rtl_list_2stage_rtl.tcl."
+
+    - title: "LEC FAQs"
+      page_id: "1551049998"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1551049998"
+      tags: [cheetah2, lec, faq, conformal]
+      tool: conformal
+      summary: "LEC FAQ — debugging inspectFEV errors, adding waivers, ctech alias map."
+
+    - title: "Cheetah2 FE Flows Coverage"
+      page_id: "1700639419"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1700639419"
+      tags: [cheetah2, coverage]
+
+    - title: "Cheetah2 R2G EoU BareMetal/SEG"
+      page_id: "1543752194"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1543752194"
+      tags: [cheetah2, r2g, eou, baremetal]
+      summary: "Tracks Cheetah2 R2G EoU items. Cross-references multiple Inspect FEV / Genesis FEV HSDES."
+
+    - title: "Cheetah2 Server_IP Deployment Wiki"
+      page_id: "1732032025"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1732032025"
+      tags: [cheetah2, deployment, server-ip]
+
+    - title: "Cheetah2 Release and Validation"
+      page_id: "1503789574"
+      url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1503789574"
+      tags: [cheetah2, release, validation]
+
+    # ---- Cheetah2 yearly test waivers (each carries FEV-relevant waiver rows) ----
+    - { title: "Cheetah2 2026.03 Test Waivers",  page_id: "4627769018", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4627769018", tags: [cheetah2, waiver, test] }
+    - { title: "Cheetah2 2025.12 Test Waivers",  page_id: "4447214549", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4447214549", tags: [cheetah2, waiver, test] }
+    - { title: "Cheetah2 2025.09.plus Test Waivers", page_id: "4378101704", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4378101704", tags: [cheetah2, waiver, test] }
+    - { title: "Cheetah2 2025.09 Test Waivers",  page_id: "4243631467", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4243631467", tags: [cheetah2, waiver, test] }
+    - { title: "Cheetah2 2020.09 Test Waiver",   page_id: "1632740583", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1632740583", tags: [cheetah2, waiver, test, legacy] }
+
+    # ---- Cheetah2 integration / validation cycles ----
+    - { title: "Cheetah2 - 2025.12 Integration and Validation",      page_id: "3879508943", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3879508943", tags: [cheetah2, integration, validation] }
+    - { title: "Cheetah2 - 2025.09.plus Integration and Validation", page_id: "4425104500", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4425104500", tags: [cheetah2, integration, validation] }
+    - { title: "Cheetah2 2023.03.SP1 Integration and Validation",    page_id: "2683747608", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2683747608", tags: [cheetah2, integration, validation] }
+
+  # ==========================================================================
+  # Highly-ranked entry points — what to read FIRST for any FEV question. The
+  # Jira-Wiki-Researcher emits these as suggestions when the user is vague.
+  # ==========================================================================
+  highly_ranked:
+    - { rank: 1,  title: "FEV (root)",                        page_id: "2288898439", url: "https://wiki.ith.intel.com/display/cheetah/FEV",                                why: "Index of everything FEV." }
+    - { rank: 2,  title: "FEV_CONFORMAL",                     page_id: "2376013930", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013930",            why: "Canonical Conformal flow page (tasks, iVARs, hooks)." }
+    - { rank: 3,  title: "FEV_FORMALITY",                     page_id: "2376013928", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2376013928",            why: "Canonical Formality flow page (tasks, iVARs, hooks)." }
+    - { rank: 4,  title: "FEV_CONFORMAL BKMs",                page_id: "2288898444", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288898444",            why: "Conformal BKMs — first stop for methodology questions." }
+    - { rank: 5,  title: "FEV_FORMALITY BKMs",                page_id: "2967972768", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2967972768",            why: "Formality BKMs — first stop for methodology questions." }
+    - { rank: 6,  title: "debugFEV",                          page_id: "2591606319", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2591606319",            why: "Active debug guide. Versioned and frequently updated." }
+    - { rank: 7,  title: "InspectFEV",                        page_id: "2716142730", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2716142730",            why: "Audit tool — IF_<block>_<task>/ outputs." }
+    - { rank: 8,  title: "FEV Release Notes",                 page_id: "3086369633", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3086369633",            why: "What changed in the latest FEV release." }
+    - { rank: 9,  title: "Indicators",                        page_id: "4112071888", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4112071888",            why: "FEV indicators / metrics." }
+    - { rank: 10, title: "FEV_CONFORMAL Paranoia",            page_id: "2288898447", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288898447",            why: "Conformal signoff paranoia run." }
+    - { rank: 11, title: "FEV_Formality Signoff and Paranoia runs", page_id: "2799577214", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2799577214",      why: "Formality signoff paranoia run." }
+    - { rank: 12, title: "Feedthrough Cross Check",           page_id: "4172208888", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=4172208888",            why: "Feedthrough audit between flows." }
+    - { rank: 13, title: "RTL2RTL FEV Utility",               page_id: "2602665916", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2602665916",            why: "RTL-to-RTL flow utility." }
+    - { rank: 14, title: "sim2syn FEV",                       page_id: "3003274855", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3003274855",            why: "sim2syn flow." }
+    - { rank: 15, title: "Compare Recipe Finder",             page_id: "3205930885", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3205930885",            why: "Mapping / compare recipe selector." }
+    - { rank: 16, title: "FEV_CONFORMAL Training",            page_id: "2397482922", url: "https://wiki.ith.intel.com/display/cheetah/FEV_CONFORMAL+Training",             why: "Conformal onboarding training." }
+    - { rank: 17, title: "FEV_FORMALITY Training",            page_id: "2517804040", url: "https://wiki.ith.intel.com/display/cheetah/FEV_FORMALITY+Training",             why: "Formality onboarding training." }
+    - { rank: 18, title: "LEC FAQs",                          page_id: "1551049998", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=1551049998",            why: "LEC FAQ — common issues + waivers." }
+    - { rank: 19, title: "FEV Cheetah Flow BKM/FAQs",         page_id: "2288658823", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=2288658823",            why: "Cheetah-level FEV BKM/FAQ index + training video." }
+    - { rank: 20, title: "Cheetah2 - 2025.12 Integration and Validation", page_id: "3879508943", url: "https://wiki.ith.intel.com/pages/viewpage.action?pageId=3879508943", why: "Latest Cheetah2 release validation page (FEV-relevant)." }
+
+  # ==========================================================================
+  # Maintenance contract — how this index is kept fresh.
+  # ==========================================================================
+  maintenance:
+    owners: ["@Jira-Wiki-Researcher", "@FEV-Lead"]
+    refresh_cadence: "every release cycle, or when a `last_seen_version` drifts more than 5 versions behind live."
+    refresh_procedure:
+      - "Run `mcp_wiki-jira-mcp_confluence_get_page_children(parent_id=<root>)` for each subtree."
+      - "Diff returned `version` against `last_seen_version` field; bump and update `last_updated`."
+      - "Add new child pages to the corresponding `*_subtree.children` list."
+      - "If a `highly_ranked` page is deprecated upstream, move it to `curated_pages` with a `deprecated: true` tag, do NOT delete (Jira-Wiki-Researcher cites history)."
+    add_a_page:
+      - "Append to `curated_pages` with title/page_id/url/tags/(tool)/summary."
+      - "If it is a sub-page of FEV/FEV_CONFORMAL/FEV_FORMALITY, also append to the matching `*_subtree.children`."
+      - "If it should jump to top-of-mind, add a row to `highly_ranked` with rank and `why`."
+
+  # Free-form team / project pages to be appended over time — the Jira-Wiki-Researcher will prompt
+  # you whenever it finds a page that looks useful but isn't yet indexed.
+  # - title: "<…>"
+  #   url: "<…>"
+  #   page_id: "<…>"
+  #   tags: [bkm, modeling, …]
+  #   tool: conformal       # or formality, both, or omit
+
+jira:
+  projects:
+    # - key: FEV
+    #   purpose: "FEV team work tracking"
+    - {}
+
+hsdes:
+  notable_tags:
+    # Suggest the user populate these once team conventions are confirmed.
+    # - fev-conformal
+    # - fev-formality
+    # - cth-fev-blocker
+    - placeholder
