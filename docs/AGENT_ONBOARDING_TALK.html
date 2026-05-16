@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Agent Engineering 101 — 20-minute tour</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<style>
+  .reveal h1, .reveal h2, .reveal h3 { text-transform: none; letter-spacing: 0; }
+  .reveal h1 { font-size: 1.8em; }
+  .reveal h2 { font-size: 1.4em; color: #4FC3F7; }
+  .reveal h3 { font-size: 1.1em; color: #FFD54F; }
+  .reveal section { font-size: 0.65em; text-align: left; }
+  .reveal pre { width: 100%; box-shadow: none; font-size: 0.7em; }
+  .reveal pre code { padding: 12px; max-height: 520px; }
+  .reveal table { font-size: 0.85em; margin: 0.5em 0; }
+  .reveal table th { background: #1a1a1a; color: #4FC3F7; padding: 6px 10px; }
+  .reveal table td { padding: 6px 10px; vertical-align: top; }
+  .reveal table tr:nth-child(even) td { background: #1c1c1c; }
+  .good { color: #81C784; font-weight: bold; }
+  .bad  { color: #E57373; font-weight: bold; }
+  .reveal blockquote { font-size: 0.85em; color: #BDBDBD; border-left: 4px solid #4FC3F7; }
+  .footer { position: fixed; bottom: 8px; right: 16px; font-size: 0.5em; color: #555; }
+  .reveal .ascii { font-family: 'Consolas', 'Courier New', monospace; white-space: pre; line-height: 1.2; font-size: 0.7em; background: #111; padding: 14px; border-radius: 6px; }
+  .pill { display: inline-block; background: #263238; color: #4FC3F7; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; }
+  ul li { margin-bottom: 0.3em; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1 -->
+<section>
+  <h1>Agent Engineering 101</h1>
+  <h3>A 20-minute tour</h3>
+  <p>Running example: <em>teach Copilot to read &amp; triage a FEV log.</em></p>
+  <blockquote>By the end of this talk you can build a mini FEV log-triage agent from scratch.</blockquote>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2>Why are we here?</h2>
+  <p>You've used Copilot Chat. It's smart, but:</p>
+  <ul>
+    <li>It doesn't know what <code>fev_rtl2syn</code> means.</li>
+    <li>It re-asks the same questions every session.</li>
+    <li>It hallucinates paths because it has never seen our ward layout.</li>
+  </ul>
+  <p><strong>Agent engineering</strong> = teaching Copilot your domain <em>once</em>, in files that live next to your code, so every engineer gets the same expert behavior.</p>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2>What you'll walk away with</h2>
+  <ol>
+    <li>The <strong>five files</strong> that make an agent (and what each one does).</li>
+    <li>The <strong>folder layout</strong> Copilot expects.</li>
+    <li>How the files <strong>interlink</strong> — why splitting matters.</li>
+    <li>A working mini-agent: <code>fev-log-mini</code> — parses a Conformal/Formality log.</li>
+    <li>The most common <strong>good-way vs bad-way</strong> mistakes.</li>
+  </ol>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2>Mental model: 5 primitives</h2>
+  <table>
+    <thead><tr><th>Primitive</th><th>File</th><th>Job</th><th>Loaded when</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Instructions</strong></td><td><code>*.instructions.md</code></td><td>Always-on domain primer</td><td>Every turn (if <code>applyTo</code> matches)</td></tr>
+      <tr><td><strong>Skill</strong></td><td><code>SKILL.md</code></td><td>A reusable <em>procedure</em></td><td>Auto-loaded by description match</td></tr>
+      <tr><td><strong>Agent</strong></td><td><code>*.agent.md</code></td><td>A persona with tools + a role</td><td>User picks it, or master delegates</td></tr>
+      <tr><td><strong>Sub-agent</strong></td><td><code>*.agent.md</code> + <code>user-invocable: false</code></td><td>A specialist the master calls</td><td>Master invokes via <code>runSubagent</code></td></tr>
+      <tr><td><strong>Prompt</strong></td><td><code>*.prompt.md</code></td><td>A one-click user-facing recipe</td><td>User types <code>/promptname</code></td></tr>
+    </tbody>
+  </table>
+  <blockquote><em>Instructions teach, skills do, agents are personas, prompts are shortcuts.</em></blockquote>
+</section>
+
+<!-- 5 -->
+<section>
+  <h2>The folder layout</h2>
+<div class="ascii">.github/
+├── copilot-instructions.md      # base layer, always on
+├── instructions/                # auto-attached primers (by applyTo)
+│   └── fev-domain.instructions.md
+├── skills/                      # reusable procedures
+│   └── fev-log-analysis/
+│       └── SKILL.md
+├── agents/                      # personas
+│   ├── fev-lead.agent.md        # the master (user-invocable)
+│   └── log-analyzer.agent.md    # a sub-agent
+├── prompts/                     # one-click recipes
+│   └── analyze-fev-log.prompt.md
+└── config/                      # data your agents read
+    └── log-signatures.yaml</div>
+  <p>Copilot only auto-discovers files under <code>.github/</code>. Anything else, you must point to.</p>
+</section>
+
+<!-- 6 -->
+<section>
+  <h2>Running example: "Parse this FEV log"</h2>
+  <p>A FEV engineer pastes:</p>
+<pre><code class="hljs">Comparing... compare points = 1234
+Non-equivalent points = 7
+ERROR: abort in flatten_model</code></pre>
+  <p>Without an agent: <em>"It looks like there's an error."</em></p>
+  <p>With an agent:</p>
+  <blockquote>Conformal run, hit <code>flatten_model</code> abort after detecting 7 non-equivalent points. Likely cause: missing UPF or guidance file. Check <code>ivar($task,guidance_file_path)</code> in your ward's <code>vars.tcl</code>. See <code>reports/compare.rpt</code> for the 7 mismatches.</blockquote>
+  <p>That difference = <strong>5 small files</strong> working together.</p>
+</section>
+
+<!-- 7 -->
+<section>
+  <h2>File #1: the instruction file</h2>
+  <p><code>.github/instructions/fev-domain.instructions.md</code></p>
+<pre><code class="language-markdown" data-trim>---
+applyTo: '**'
+description: 'FEV vocabulary — always loaded.'
+---
+
+# FEV domain primer
+
+- Conformal LEC log → `logs/lec.log`. Formality log → `logs/fm.log`.
+- Run-area pattern: `$ward/runs/$block/$tech/$flow/$task`
+- "Non-equivalent" = a compare point where golden ≠ revised.
+- "Abort" = tool gave up. Always look at the line *before* the abort.
+- iVAR `ivar($task,guidance_file_path)` = vsdc (Conformal) or SVF (Formality).
+</code></pre>
+  <p><strong>Purpose</strong>: always in context. Copilot now <em>knows what we mean</em>.</p>
+</section>
+
+<!-- 8 -->
+<section>
+  <h2>Good vs bad: instruction files</h2>
+  <table>
+    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
+    <tbody>
+      <tr><td>50 lines of dense vocab + a few hard rules.</td><td>800-line essay copy-pasted from the wiki.</td></tr>
+      <tr><td><code>applyTo: '**'</code> for true global facts.</td><td><code>applyTo: '**'</code> for project-specific stuff (bloats every turn).</td></tr>
+      <tr><td>Names canonical paths (<code>logs/lec.log</code>).</td><td>Vague: "logs are usually in the build dir."</td></tr>
+      <tr><td>One file per topic.</td><td>Mega-file mixing 6 topics.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Why it matters</strong>: instructions load <em>every turn</em>. Bloat = slower, dumber answers.</p>
+</section>
+
+<!-- 9 -->
+<section>
+  <h2>File #2: the skill</h2>
+  <p><code>.github/skills/fev-log-analysis/SKILL.md</code></p>
+<pre><code class="language-markdown" data-trim>---
+name: fev-log-analysis
+description: Parse Conformal/Formality logs, build a timeline,
+             find first abort, correlate to reports.
+---
+
+# Skill: fev-log-analysis
+
+## When to use
+- "Analyze this lec.log."
+- "Why did Formality abort?"
+
+## Procedure
+1. Detect tool from header (Conformal banner vs Formality banner).
+2. Match each line against signatures in `config/log-signatures.yaml`.
+3. Build a milestone timeline (line numbers).
+4. Find the first ERROR / abort; show ±10 lines.
+5. Suggest the next move (check iVAR, search HSD, etc.).
+</code></pre>
+  <p>Any agent with the right tools auto-invokes this. The <code>description</code> is a <strong>search key</strong>.</p>
+</section>
+
+<!-- 10 -->
+<section>
+  <h2>Good vs bad: skills</h2>
+  <table>
+    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
+    <tbody>
+      <tr><td>Description names trigger phrases: "parse log", "find abort".</td><td>Description says "helps with FEV stuff."</td></tr>
+      <tr><td>Numbered, deterministic procedure.</td><td>"Use your judgment to analyze the log."</td></tr>
+      <tr><td>Points to <strong>data files</strong> so the catalog can grow.</td><td>Hardcodes 200 regexes inline.</td></tr>
+      <tr><td>One skill = one job.</td><td>One skill that "parses logs, opens HSDs, writes BKMs".</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 11 -->
+<section>
+  <h2>File #3: the master agent</h2>
+  <p><code>.github/agents/fev-lead.agent.md</code></p>
+<pre><code class="language-markdown" data-trim>---
+description: 'FEV-Lead — entry point for FEV triage. Routes to specialists.'
+tools: [read/readFile, search/codebase, agent/runSubagent]
+agents: [log-analyzer]      # allow-list of sub-agents
+user-invocable: true
+---
+
+# FEV-Lead
+
+You are the entry point. On every turn:
+1. Classify the user's intent.
+2. Announce which sub-agent will handle it.
+3. Call `runSubagent(name="log-analyzer", prompt="<scoped task>")`.
+4. Cite results.
+
+## Available sub-agents
+- `log-analyzer` — when user says "log / abort / non-equivalent / failure".
+</code></pre>
+  <p>The one visible persona. It does no real work — it <strong>routes</strong>.</p>
+</section>
+
+<!-- 12 -->
+<section>
+  <h2>File #4: the sub-agent</h2>
+  <p><code>.github/agents/log-analyzer.agent.md</code></p>
+<pre><code class="language-markdown" data-trim>---
+description: 'Log-Analyzer — parses lec.log / fm.log.
+              Triggers: "log", "abort", "non-equivalent", "ERROR".'
+tools: [read/readFile, search/textSearch, search/fileSearch]
+user-invocable: false
+---
+
+# Log-Analyzer
+
+You analyze FEV logs using the `fev-log-analysis` skill.
+
+## Output contract
+TOOL:        conformal | formality
+TIMELINE:    &lt;line-numbered milestones&gt;
+FIRST_FAIL:  &lt;line N + ±10 context&gt;
+NEXT_STEP:   &lt;suggested action&gt;
+</code></pre>
+  <p>Narrow specialist. Never shows up in chat picker. Master-only.</p>
+  <blockquote>Sub-agents are <strong>stateless</strong>. One prompt in, one structured answer out.</blockquote>
+</section>
+
+<!-- 13 -->
+<section>
+  <h2>Good vs bad: agents</h2>
+  <table>
+    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
+    <tbody>
+      <tr><td>Master = router with 1–2 tools. Sub = specialist with focused tools.</td><td>One mega-agent doing everything.</td></tr>
+      <tr><td>Sub-agent description reads like a <strong>trigger list</strong>.</td><td>Generic ("a helpful assistant for FEV").</td></tr>
+      <tr><td>Master has an <code>agents:</code> allow-list.</td><td>Master can call anything, anywhere.</td></tr>
+      <tr><td>Explicit output contract.</td><td>Free-form prose that breaks downstream parsing.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>The trap</strong>: too many tools is worse than too few. Pick the minimum.</p>
+</section>
+
+<!-- 14 -->
+<section>
+  <h2>File #5: the prompt</h2>
+  <p><code>.github/prompts/analyze-fev-log.prompt.md</code></p>
+<pre><code class="language-markdown" data-trim>---
+mode: agent
+description: 'Analyze a FEV log: timeline + first failure + next step.'
+---
+
+Log: **${input:log_path_or_excerpt}**
+
+Invoke `FEV-Lead` and ask it to analyze the log above using the
+`fev-log-analysis` skill. Render:
+- timeline
+- first failure block (±10 lines)
+- one suggested next step
+</code></pre>
+  <p>User types <code>/analyze-fev-log</code>, gets prompted for a path, and the machinery fires.</p>
+  <blockquote>Prompts are <strong>user-facing</strong>. Sub-agents cannot run prompts — for that, use a skill.</blockquote>
+</section>
+
+<!-- 15 -->
+<section>
+  <h2>How they interlink</h2>
+<div class="ascii">User types /analyze-fev-log
+        │
+        ▼
+┌─────────────────────────┐
+│  analyze-fev-log.prompt │  (the recipe)
+└──────────┬──────────────┘
+           │ "invoke FEV-Lead"
+           ▼
+┌─────────────────────────┐
+│  FEV-Lead (agent)       │  (the router)
+└──────────┬──────────────┘
+           │ runSubagent("log-analyzer", ...)
+           ▼
+┌─────────────────────────┐
+│  Log-Analyzer (sub)     │  (the specialist)
+└──────────┬──────────────┘
+           │ auto-loads
+           ▼
+┌─────────────────────────┐    reads
+│  fev-log-analysis SKILL │ ───────► config/log-signatures.yaml
+└─────────────────────────┘
+
+ALWAYS in context (every turn):
+   fev-domain.instructions.md   (the primer)</div>
+  <p><strong>Key insight</strong>: each file does ONE thing. They compose via <em>descriptions</em>, not imports.</p>
+</section>
+
+<!-- 16 -->
+<section>
+  <h2>Discovery: how Copilot finds your stuff</h2>
+  <table>
+    <thead><tr><th>File</th><th>How it loads</th></tr></thead>
+    <tbody>
+      <tr><td><code>copilot-instructions.md</code></td><td>Always, no matching needed.</td></tr>
+      <tr><td><code>*.instructions.md</code></td><td>Auto-attached if <code>applyTo</code> glob matches.</td></tr>
+      <tr><td><code>SKILL.md</code></td><td>Model picks it when <code>description</code> matches the task.</td></tr>
+      <tr><td><code>*.agent.md</code> (user-invocable)</td><td>User picks from chat agent menu.</td></tr>
+      <tr><td><code>*.agent.md</code> (sub-agent)</td><td>Master calls by name via <code>runSubagent</code>.</td></tr>
+      <tr><td><code>*.prompt.md</code></td><td>User types <code>/promptname</code>.</td></tr>
+      <tr><td><code>config/*.yaml</code></td><td>Only when an agent/skill explicitly reads the file.</td></tr>
+    </tbody>
+  </table>
+  <blockquote><strong>Descriptions are the API.</strong> They're how Copilot decides what to load.</blockquote>
+</section>
+
+<!-- 17 -->
+<section>
+  <h2>The two killer mistakes</h2>
+  <h3 class="bad">A. Overfitting</h3>
+  <p>500-line agent that knows your exact ward, your exact block, your exact tag.<br>
+  → Nobody else can use it. You built a script, not an agent.</p>
+  <p><strong>Fix</strong>: parameterize via inputs &amp; config files. Keep the agent generic; put project-specific data in <code>config/</code>.</p>
+  <h3 class="bad">B. Underfitting</h3>
+  <p>"You are a helpful FEV assistant. Help the user."<br>
+  → It does nothing the base Copilot wouldn't already do.</p>
+  <p><strong>Fix</strong>: hard rules, concrete vocabulary, explicit output contracts. Tell it what NOT to do.</p>
+  <blockquote>Diagnose by reading the agent's body aloud — would <em>you</em> know what to do?</blockquote>
+</section>
+
+<!-- 18 -->
+<section>
+  <h2>Good vs bad: prompts</h2>
+  <table>
+    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
+    <tbody>
+      <tr><td>One job: "analyze this log". Asks for the inputs it needs.</td><td>"Do all FEV things."</td></tr>
+      <tr><td>Delegates to an agent, doesn't redo its work.</td><td>Re-implements the skill inline.</td></tr>
+      <tr><td>Names the agent + skill it expects.</td><td>Hopes Copilot guesses.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 19 -->
+<section>
+  <h2>Build it live (10 minutes)</h2>
+<pre><code class="language-bash" data-trim>mkdir -p .github/{instructions,skills/fev-log-mini,agents,prompts,config}</code></pre>
+  <p>Then create the 5 files (copy from the earlier slides).</p>
+  <p><strong>Smoke tests:</strong></p>
+  <ol>
+    <li>Open chat → pick <strong>FEV-Lead</strong> → ask "what can you do?" → it should list <code>log-analyzer</code>.</li>
+    <li>Paste a fake log with <code>ERROR: abort</code> → it should route to <code>Log-Analyzer</code> and produce a timeline.</li>
+    <li>Type <code>/analyze-fev-log</code> → it should prompt for a path.</li>
+  </ol>
+  <p>If a smoke test fails, the <strong>description</strong> field of the relevant file is your prime suspect.</p>
+</section>
+
+<!-- 20 -->
+<section>
+  <h2>Why this matters in FEV</h2>
+  <p>FEV is <strong>vocabulary-heavy</strong>:</p>
+  <p>
+    <span class="pill">non-equivalent</span>
+    <span class="pill">abort</span>
+    <span class="pill">compare point</span>
+    <span class="pill">flatten_model</span>
+    <span class="pill">lec.log</span>
+    <span class="pill">fm.log</span>
+    <span class="pill">vsdc</span>
+    <span class="pill">svf</span>
+    <span class="pill">ivar</span>
+    <span class="pill">hook file</span>
+    <span class="pill">run-area</span>
+    <span class="pill">override layer</span>
+  </p>
+  <p>These carry exact meaning to us, but nothing to vanilla Copilot. <strong>30 lines</strong> of instructions changes Copilot from a generalist into a teammate.</p>
+  <blockquote>Every domain has its own vocabulary. The first agent you build for any new domain should always be an <code>*.instructions.md</code>.</blockquote>
+</section>
+
+<!-- 21 -->
+<section>
+  <h2>Recap</h2>
+  <ul>
+    <li>The <strong>5 primitives</strong> (instruction, skill, agent, sub-agent, prompt) — one job each.</li>
+    <li>The <strong>.github/</strong> folder layout Copilot auto-discovers.</li>
+    <li>They <strong>interlink via descriptions</strong>, not imports.</li>
+    <li>The two failure modes: <strong>overfit</strong> (too narrow) and <strong>underfit</strong> (too vague).</li>
+    <li>The pattern: <strong>prompt → master agent → sub-agent → skill → config data</strong>.</li>
+  </ul>
+  <h3>Your homework</h3>
+  <ol>
+    <li>Pick one pain you hit this week (a log, a script, a report).</li>
+    <li>Write a 30-line <code>*.instructions.md</code> for it.</li>
+    <li>Add ONE skill that does the recurring task.</li>
+    <li>Ship it as a PR. Iterate from there.</li>
+  </ol>
+  <p style="margin-top:1em;"><strong>Questions?</strong></p>
+</section>
+
+</div></div>
+
+<div class="footer">Agent Engineering 101 · use ← / → · press <kbd>F</kbd> for fullscreen, <kbd>S</kbd> for speaker view</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+</script>
+</body>
+</html>

@@ -24,7 +24,6 @@
 > **Recommended companion reading** before/while reading Part A:
 >
 > - [GeeksForGeeks — Building AI Agents](https://www.geeksforgeeks.org/artificial-intelligence/building-ai-agents/) — conceptual primer for newcomers to agent architecture.
-> - [OpenAI — A Practical Guide to Building AI Agents](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/) — vendor-agnostic patterns, design loops, and lifecycle diagrams.
 > - [GitHub Copilot Customization Handbook (Copilot Academy)](https://copilot-academy.github.io/workshops/copilot-customization/copilot_customization_handbook) — the canonical reference; this Part A is structured around the same primitives.
 > - [awesome-copilot](https://github.com/github/awesome-copilot) — community-maintained marketplace of prebuilt agents, skills, prompts, instructions, hooks, and plugins. Two notable agents: [devils-advocate](https://awesome-copilot.github.com/agents/#file=agents%2Fdevils-advocate.agent.md) and [principal-software-engineer](https://awesome-copilot.github.com/agents/#file=agents%2Fprincipal-software-engineer.agent.md).
 > - [GitNexus](https://github.com/abhigyanpatwari/GitNexus) — client-side graph-RAG over a repo for code exploration; useful as a knowledge-graph backend for an agent.
@@ -33,44 +32,44 @@
 
 ## Table of Contents
 
-Part A contents:
+### Part A — GitHub Copilot Foundations
 
-Start: [First 90 minutes to a useful agent](#start-here--first-90-minutes)
-A1. [Mental model — what each primitive is for](#a1-mental-model)
-A2. [The canonical `.github/` folder layout](#a2-the-canonical-github-folder-layout)
-A3. [The primitives — one section each](#a3-the-primitives)
-A3.1 [Agent instructions (`copilot-instructions.md` / `AGENTS.md`)](#a31-agent-instructions-always-on-base-layer)
-A3.2 [File instructions (`*.instructions.md`)](#a32-file-instructions-instructionsmd)
-A3.3 [Prompts (`*.prompt.md`)](#a33-prompts-promptmd)
-A3.4 [Skills (`SKILL.md`)](#a34-skills-skillmd)
-A3.5 [Custom agents (`*.agent.md`)](#a35-custom-agents-agentmd)
-A3.6 [Hooks (`*.json` or inline)](#a36-hooks-deterministic-lifecycle-automation)
-A3.7 [MCP servers (`.vscode/mcp.json`)](#a37-mcp-servers-vscodemcpjson)
-A3.8 [Config files (your own YAML)](#a38-config-files-your-own-yaml)
-A4. [The master/sub-agent pattern (incl. handoffs)](#a4-the-mastersub-agent-pattern)
-A5. [Discovery & loading — how Copilot actually finds your stuff](#a5-discovery--loading)
-A6. [Tooling — aliases, MCP scoping, allow/deny](#a6-tooling)
-A7. [Tool permissions & security — blast radius, least privilege, MCP risks](#a7-tool-permissions--security)
-A8. [YAML frontmatter cheat sheet](#a8-yaml-frontmatter-cheat-sheet)
-A9. [Dos and Don'ts](#a9-dos-and-donts)
-A10. [End-to-end worked example](#a10-end-to-end-worked-example)
-A11. [Maintenance, versioning, testing](#a11-maintenance-versioning-testing)
-A12. [Beyond the basics — plugins, agentic workflows, agentic memory](#a12-beyond-the-basics)
-A13. [Appendix — Official documentation links](#a13-appendix)
+- [Start here — first 90 minutes to a useful agent](#start-here--first-90-minutes)
+- A1. [Mental model — what each primitive is for](#a1-mental-model)
+- A2. [The canonical `.github/` folder layout](#a2-the-canonical-github-folder-layout)
+- A3. [The primitives — one section each](#a3-the-primitives)
+  - A3.1 [Agent instructions (`copilot-instructions.md` / `AGENTS.md`)](#a31-agent-instructions-always-on-base-layer)
+  - A3.2 [File instructions (`*.instructions.md`)](#a32-file-instructions-instructionsmd)
+  - A3.3 [Prompts (`*.prompt.md`)](#a33-prompts-promptmd)
+  - A3.4 [Skills (`SKILL.md`)](#a34-skills-skillmd)
+  - A3.5 [Custom agents (`*.agent.md`)](#a35-custom-agents-agentmd)
+  - A3.6 [Hooks (`*.json` or inline)](#a36-hooks-deterministic-lifecycle-automation)
+  - A3.7 [MCP servers (`.vscode/mcp.json`)](#a37-mcp-servers-vscodemcpjson)
+  - A3.8 [Config files (your own YAML)](#a38-config-files-your-own-yaml)
+- A4. [The master/sub-agent pattern (incl. handoffs)](#a4-the-mastersub-agent-pattern)
+- A5. [Discovery & loading — how Copilot actually finds your stuff](#a5-discovery--loading)
+- A6. [Tooling — aliases, MCP scoping, allow/deny](#a6-tooling)
+- A7. [Tool permissions & security — blast radius, least privilege, MCP risks](#a7-tool-permissions--security)
+- A8. [YAML frontmatter cheat sheet](#a8-yaml-frontmatter-cheat-sheet)
+- A9. [Dos and Don'ts](#a9-dos-and-donts)
+- A10. [End-to-end worked example](#a10-end-to-end-worked-example)
+- A11. [Maintenance, versioning, testing](#a11-maintenance-versioning-testing)
+- A12. [Beyond the basics — plugins, agentic workflows, agentic memory](#a12-beyond-the-basics)
+- A13. [Appendix — Official documentation links](#a13-appendix)
 
-Part B contents:
+### Part B — Intel Cth.ai Deployment
 
-B1. [What changes inside Cth.ai (and what doesn't)](#b1-what-changes-inside-cthai)
-B2. [Step 1 — Pre-flight & VS Code login (`cth_ai_setup`)](#b2-step-1--pre-flight)
-B3. [Step 2 — Local sandbox & the `autobots/` directory contract](#b3-step-2--local-sandbox)
-B4. [Step 3 — Python venv & the `autobots_sdk.pth` pattern](#b4-step-3--python-venv)
-B5. [Step 4 — MCP servers the Cth.ai way (`AutobotsMCPStdioServer`)](#b5-step-4--mcp-servers)
-B6. [Step 5 — Authoring agents & skills against the Cth.ai Constitution](#b6-step-5--authoring-against-the-constitution)
-B7. [Step 6 — Local validation (`cth.ai inspect` / `cth.ai setup`)](#b7-step-6--local-validation)
-B8. [Step 7 — Releasing your tool through CRT](#b8-step-7--release-through-crt)
-B9. [Step 8 — `instructions.md` as the persona + routing layer](#b9-step-8--instructionsmd)
-B10. [Cth.ai Constitution — Mandatory + Recommended checklists](#b10-cthai-constitution-checklists)
-B11. [Cth.ai citation index — wiki page IDs](#b11-citation-index)
+- B1. [What changes inside Cth.ai (and what doesn't)](#b1-what-changes-inside-cthai)
+- B2. [Step 1 — Pre-flight & VS Code login (`cth_ai_setup`)](#b2-step-1--pre-flight)
+- B3. [Step 2 — Local sandbox & the `autobots/` directory contract](#b3-step-2--local-sandbox)
+- B4. [Step 3 — Python venv & the `autobots_sdk.pth` pattern](#b4-step-3--python-venv)
+- B5. [Step 4 — MCP servers the Cth.ai way (`AutobotsMCPStdioServer`)](#b5-step-4--mcp-servers)
+- B6. [Step 5 — Authoring agents & skills against the Cth.ai Constitution](#b6-step-5--authoring-against-the-constitution)
+- B7. [Step 6 — Local validation (`cth.ai inspect` / `cth.ai setup`)](#b7-step-6--local-validation)
+- B8. [Step 7 — Releasing your tool through CRT](#b8-step-7--release-through-crt)
+- B9. [Step 8 — `instructions.md` as the persona + routing layer](#b9-step-8--instructionsmd)
+- B10. [Cth.ai Constitution — Mandatory + Recommended checklists](#b10-cthai-constitution-checklists)
+- B11. [Cth.ai citation index — wiki page IDs](#b11-citation-index)
 
 ---
 
@@ -804,9 +803,9 @@ The pattern your workspace already implements:
    └──┬──────┬──────┬────────────┘
       │      │      │  runSubagent(name, prompt)
       ▼      ▼      ▼
-   ┌───┐  ┌───┐  ┌───┐
+   ┌────┐  ┌────┐  ┌────┐
    │ r1 │  │ r2 │  │ r3 │   all: user-invocable: false
-   └───┘  └───┘  └───┘
+   └────┘  └────┘  └────┘
 ```
 
 ### Recipe
