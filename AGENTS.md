@@ -222,6 +222,19 @@ Proc overrides: `scripts/user_procs.tcl` (Conformal), `scripts/user_fm_procs.tcl
 | [`Jira-Wiki-Researcher`](agents/jira-wiki-researcher.agent.md) | Confluence + Jira BKM / INote research using `mcp_wiki-jira-mcp_*`. |
 | [`Ward-Explorer`](agents/ward-explorer.agent.md) | Ward layout, override hierarchy, run-area + iVAR + hook-file awareness. |
 | [`Log-Analyzer`](agents/log-analyzer.agent.md) | `lec.log` / `fm.log` parsing, InspectFEV/Greenstone correlation. |
+| [`FEV-CoEngineer`](agents/fev-coengineer.agent.md) | Pair-debugging persona — senior FEV engineer + devil's advocate. |
+
+## Skills in this workspace
+
+| Skill | Purpose |
+|-------|---------|
+| [`fev-log-analysis`](.github/skills/fev-log-analysis/SKILL.md) | Parse `lec.log` / `fm.log` for non-equiv, abort, InspectFEV failures. |
+| [`fev-ward-context`](.github/skills/fev-ward-context/SKILL.md) | Resolve ward override stack and iVAR values. |
+| [`fev-regression-compare`](.github/skills/fev-regression-compare/SKILL.md) | Compare two FEV regression tags (Conformal **or** Formality/VCLP) block-by-block via `.stats` diffs + `fm.log` warning analysis. Writes canonical Python to `/tmp/fev_regcomp/`, produces JSON, renders final MD to user CWD. |
+| [`hsd-fetch-summarize`](.github/skills/hsd-fetch-summarize/SKILL.md) | Fetch an HSD ticket and produce a structured summary. |
+| [`hsd-similar-issues`](.github/skills/hsd-similar-issues/SKILL.md) | Search for prior HSD sightings similar to a given ticket. |
+| [`jira-wiki-bkm-lookup`](.github/skills/jira-wiki-bkm-lookup/SKILL.md) | Search Confluence + Jira for BKMs, INotes, training pages. |
+| [`mcp-discovery`](.github/skills/mcp-discovery/SKILL.md) | Enumerate available MCP tools and describe capabilities. |
 
 ## House rules
 
