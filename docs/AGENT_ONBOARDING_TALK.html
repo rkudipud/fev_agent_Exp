@@ -1,423 +1,808 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Agent Engineering 101 — 20-minute tour</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agent Engineering 101 — Launch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
 <style>
-  .reveal h1, .reveal h2, .reveal h3 { text-transform: none; letter-spacing: 0; }
-  .reveal h1 { font-size: 1.8em; }
-  .reveal h2 { font-size: 1.4em; color: #4FC3F7; }
-  .reveal h3 { font-size: 1.1em; color: #FFD54F; }
-  .reveal section { font-size: 0.65em; text-align: left; }
-  .reveal pre { width: 100%; box-shadow: none; font-size: 0.7em; }
-  .reveal pre code { padding: 12px; max-height: 520px; }
-  .reveal table { font-size: 0.85em; margin: 0.5em 0; }
-  .reveal table th { background: #1a1a1a; color: #4FC3F7; padding: 6px 10px; }
-  .reveal table td { padding: 6px 10px; vertical-align: top; }
-  .reveal table tr:nth-child(even) td { background: #1c1c1c; }
-  .good { color: #81C784; font-weight: bold; }
-  .bad  { color: #E57373; font-weight: bold; }
-  .reveal blockquote { font-size: 0.85em; color: #BDBDBD; border-left: 4px solid #4FC3F7; }
-  .footer { position: fixed; bottom: 8px; right: 16px; font-size: 0.5em; color: #555; }
-  .reveal .ascii { font-family: 'Consolas', 'Courier New', monospace; white-space: pre; line-height: 1.2; font-size: 0.7em; background: #111; padding: 14px; border-radius: 6px; }
-  .pill { display: inline-block; background: #263238; color: #4FC3F7; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 4px; }
-  ul li { margin-bottom: 0.3em; }
+:root{
+  /* Fixed-canvas presentation scale */
+  --ui-scale:1;
+  --viewport-scale:1;
+  --fs-xxs:calc(12px * var(--ui-scale));
+  --fs-xs:calc(14px * var(--ui-scale));
+  --fs-sm:calc(16px * var(--ui-scale));
+  --fs-base:calc(18px * var(--ui-scale));
+  --fs-md:calc(20px * var(--ui-scale));
+  --fs-lg:calc(24px * var(--ui-scale));
+  --fs-xl:calc(30px * var(--ui-scale));
+  --fs-2xl:calc(38px * var(--ui-scale));
+  --fs-3xl:calc(52px * var(--ui-scale));
+  --fs-display:calc(96px * var(--ui-scale));
+  --pad-x:calc(46px * var(--viewport-scale));
+  --pad-y:calc(28px * var(--viewport-scale));
+
+  /* Cool low-contrast palette v2: deep indigo base, muted steel accents */
+  --bg:#0a1228;
+  --bg-soft:#0e1834;
+  --surface:#141f3a;
+  --surface-2:#182640;
+  --surface-3:#1d2c4a;
+  --line:rgba(80,120,200,.13);
+  --line-strong:rgba(80,120,200,.22);
+  --ink:#8ab4d0;
+  --ink-soft:#577898;
+  --ink-muted:#344e68;
+  --cyan:#46aed0;
+  --blue:#5a98c8;
+  --violet:#8878c0;
+  --amber:#88a8b8;
+  --rose:#9088b8;
+  --green:#3ea4b4;
+  --code:#080d1c;
+
+  --inst:#5a98c8;
+  --skill:#3ea4b4;
+  --agent:#8878c0;
+  --prompt:#88a8b8;
+  --data:#9088b8;
+  --mcp:#46aed0;
+
+  --font-display:"Sora","Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-mono:"IBM Plex Mono","Cascadia Mono",Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{
+  color:var(--ink);
+  font-family:var(--font-display);
+  background:
+    radial-gradient(900px 560px at 8% 6%,rgba(70,174,208,.09),transparent 58%),
+    radial-gradient(780px 520px at 92% 16%,rgba(80,100,200,.08),transparent 62%),
+    radial-gradient(640px 480px at 55% 112%,rgba(50,80,160,.07),transparent 65%),
+    linear-gradient(135deg,rgba(255,255,255,.018) 1px,transparent 1px) 0 0/32px 32px,
+    linear-gradient(225deg,rgba(255,255,255,.012) 1px,transparent 1px) 0 0/48px 48px,
+    linear-gradient(180deg,#0a1228 0%,#0c1630 48%,#0e1834 100%);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,a,.dot,.navHot,[onclick]{cursor:pointer}
+.slide,.slide *{-webkit-user-select:none;user-select:none}
+pre,code{font-family:var(--font-mono);-webkit-user-select:text;user-select:text;cursor:text}
+strong{color:var(--ink);font-weight:700}
+
+.stage{position:fixed;inset:0;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;padding-bottom:56px;z-index:1}
+.deck{width:1440px;height:900px;position:relative;flex-shrink:0;transform-origin:top center}
+.slide{
+  position:absolute;inset:0;display:none;flex-direction:column;
+  padding:var(--pad-y) var(--pad-x);
+  opacity:0;transform:translateY(22px) scale(.992);
+  transition:opacity .45s cubic-bezier(.2,.7,.2,1),transform .45s cubic-bezier(.2,.7,.2,1);
+  overflow:hidden;
+}
+.slide.active{display:flex;opacity:1;transform:translateY(0) scale(1)}
+.slide.inRight{animation:inRight .42s cubic-bezier(.2,.7,.2,1)}
+.slide.inLeft{animation:inLeft .42s cubic-bezier(.2,.7,.2,1)}
+@keyframes inRight{from{opacity:0;transform:translateX(38px) scale(.985)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes inLeft{from{opacity:0;transform:translateX(-38px) scale(.985)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+.hudGrid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.65;background:
+  linear-gradient(rgba(96,165,250,.08) 1px,transparent 1px) 0 0/90px 90px,
+  linear-gradient(90deg,rgba(96,165,250,.08) 1px,transparent 1px) 0 0/90px 90px}
+.hudGrid::before{content:"";position:absolute;inset:22px;border:1px solid rgba(148,163,184,.10);border-radius:22px}
+
+h1,h2,h3,h4,p{margin:0}
+h1{font-size:var(--fs-3xl);line-height:1.02;letter-spacing:-.04em;font-weight:800}
+h2{font-size:var(--fs-2xl);line-height:1.08;letter-spacing:-.035em;font-weight:750}
+h3{font-size:var(--fs-xs);line-height:1.2;text-transform:uppercase;letter-spacing:.18em;color:var(--ink-muted);font-weight:800}
+h4{font-size:var(--fs-sm);line-height:1.2;color:var(--ink);font-weight:750}
+p,li{font-size:var(--fs-base);line-height:1.48;color:var(--ink-soft)}
+ul,ol{margin:8px 0 0 22px;padding:0;color:var(--ink-soft)}
+li{margin:5px 0}
+code{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.18);color:#dbeafe;border-radius:5px;padding:1px 5px;font-size:.88em}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex:0 0 auto}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:var(--fs-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);font-weight:800}
+.kicker::before{content:"";width:30px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:9px}
+.page{font-family:var(--font-mono);font-size:var(--fs-xxs);color:var(--ink-muted);border:1px solid var(--line);padding:5px 10px;border-radius:999px;background:rgba(16,24,39,.72)}
+.lede{font-size:var(--fs-lg);line-height:1.48;color:var(--ink-soft);max-width:980px}
+.muted{color:var(--ink-muted)}
+.small{font-size:var(--fs-sm)}
+.xs{font-size:var(--fs-xs)}
+.mono{font-family:var(--font-mono)}
+.accent{color:var(--cyan)}.blue{color:var(--blue)}.violet{color:var(--violet)}.amber{color:var(--amber)}.rose{color:var(--rose)}.green{color:var(--green)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:var(--fs-xxs);font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:999px;padding:4px 9px;border:1px solid currentColor;background:rgba(255,255,255,.04)}
+.chip.inst{color:var(--inst)}.chip.skill{color:var(--skill)}.chip.agent{color:var(--agent)}.chip.prompt{color:var(--prompt)}.chip.data{color:var(--data)}.chip.mcp{color:var(--mcp)}
+
+.panel,.card,.tile,.codePanel,.artifact,.note{
+  background:linear-gradient(180deg,rgba(21,31,52,.82),rgba(12,18,32,.86));
+  border:1px solid var(--line);
+  box-shadow:0 24px 60px -38px rgba(0,0,0,.70),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.panel{border-radius:18px;padding:22px}
+.card{border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.card::after{content:"";position:absolute;inset:auto 18px 0 18px;height:2px;background:linear-gradient(90deg,transparent,var(--line-strong),transparent)}
+.tile{border-radius:14px;padding:15px}
+.tile h4,.card h4{margin-bottom:8px}
+.tile p,.card p{font-size:var(--fs-sm)}
+.glowCyan{border-color:rgba(45,212,191,.34)}.glowBlue{border-color:rgba(96,165,250,.35)}.glowViolet{border-color:rgba(167,139,250,.35)}.glowAmber{border-color:rgba(251,191,36,.35)}.glowRose{border-color:rgba(251,113,133,.35)}.glowGreen{border-color:rgba(52,211,153,.35)}
+.bento{display:grid;gap:16px}.bento.c2{grid-template-columns:1fr 1fr}.bento.c3{grid-template-columns:repeat(3,1fr)}.bento.c4{grid-template-columns:repeat(4,1fr)}
+.split{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch;min-height:0}
+.split.reverse{grid-template-columns:.9fr 1.1fr}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grow{flex:1;min-height:0}
+
+.hero{height:100%;display:grid;grid-template-columns:1.08fr .92fr;gap:34px;align-items:center}
+.heroTitle{font-size:var(--fs-display);letter-spacing:-.075em;line-height:1.0;font-weight:800;max-width:760px}
+.heroTitle span{display:block;background:linear-gradient(115deg,#f8fbff 0%,#bfeeff 34%,#d9ccff 68%,#ffd3bd 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.heroSub{font-size:var(--fs-lg);color:var(--ink-soft);margin-top:22px;max-width:760px}
+.metricGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.metric{border-radius:18px;padding:20px;background:rgba(16,24,39,.78);border:1px solid var(--line);position:relative;overflow:hidden}
+.metric::before{content:"";position:absolute;inset:0;background:radial-gradient(260px 160px at 85% 0%,rgba(45,212,191,.16),transparent 62%)}
+.metric .value{font-size:var(--fs-2xl);font-weight:800;color:var(--ink);letter-spacing:-.04em;position:relative}
+.metric .label{font-size:var(--fs-xs);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;margin-top:8px;position:relative}
+
+.orbit{position:relative;height:520px;border-radius:28px;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.16),rgba(10,16,32,.45) 38%,rgba(10,16,32,.12) 70%);border:1px solid var(--line);overflow:hidden}
+.orbit::before,.orbit::after{content:"";position:absolute;border:1px dashed rgba(148,163,184,.22);border-radius:50%;inset:64px}.orbit::after{inset:138px;border-color:rgba(45,212,191,.24)}
+.core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;display:grid;place-items:center;text-align:center;background:linear-gradient(145deg,rgba(45,212,191,.24),rgba(96,165,250,.18));border:1px solid rgba(45,212,191,.42);box-shadow:0 0 70px rgba(45,212,191,.16)}
+.node{position:absolute;min-width:150px;text-align:center;border-radius:999px;padding:10px 13px;background:#101827;border:1px solid var(--line);font-size:var(--fs-xs);font-family:var(--font-mono);font-weight:800;color:var(--ink-soft)}
+.n1{left:52px;top:72px;border-color:rgba(96,165,250,.45);color:var(--inst)}.n2{right:56px;top:84px;border-color:rgba(52,211,153,.45);color:var(--skill)}.n3{left:62px;bottom:76px;border-color:rgba(167,139,250,.45);color:var(--agent)}.n4{right:62px;bottom:86px;border-color:rgba(251,191,36,.45);color:var(--prompt)}.n5{left:50%;bottom:24px;transform:translateX(-50%);border-color:rgba(251,113,133,.45);color:var(--data)}
+
+.artifact{border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.artifactHead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.artifactName{font-family:var(--font-mono);font-size:var(--fs-xs);font-weight:800;color:var(--ink)}
+.artifactBody{padding:14px;display:grid;grid-template-columns:1.14fr .86fr;gap:14px;min-height:0;flex:1}
+.artifactBody.narrow{grid-template-columns:1fr}
+.codePanel{background:var(--code);border-radius:12px;padding:14px;overflow:auto;color:#eef6ff;font-family:var(--font-mono);font-size:var(--fs-xs);line-height:1.5;white-space:pre;min-height:0}
+.codePanel .c{color:#7889a5;font-style:italic}.codePanel .k{color:#7dd3fc}.codePanel .s{color:#86efac}.codePanel .n{color:#fca5a5}.codePanel .y{color:#fcd34d}.codePanel .v{color:#c4b5fd}
+.facts{display:grid;gap:10px;align-content:start}
+.fact{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.fact b{display:block;color:var(--ink);font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}.fact p{font-size:var(--fs-xs);line-height:1.42;color:var(--ink-soft)}
+.doDont{display:grid;grid-template-columns:1fr 1fr;gap:10px}.doDont .fact:first-child{border-color:rgba(52,211,153,.28)}.doDont .fact:last-child{border-color:rgba(251,113,133,.28)}
+
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:12px}
+.timeline.vertical{grid-template-columns:1fr;margin-top:0}.timeline.vertical .step{min-height:0}
+.step{position:relative;border-radius:16px;padding:16px;background:rgba(16,24,39,.78);border:1px solid var(--line);min-height:172px}.step::before{content:attr(data-step);font-family:var(--font-mono);font-size:var(--fs-xxs);color:var(--ink-muted);letter-spacing:.16em}.step h4{margin:14px 0 8px}.step p{font-size:var(--fs-sm)}
+.step.inst{border-color:rgba(96,165,250,.34)}.step.skill{border-color:rgba(52,211,153,.34)}.step.agent{border-color:rgba(167,139,250,.34)}.step.prompt{border-color:rgba(251,191,36,.34)}.step.data{border-color:rgba(251,113,133,.34)}
+
+.chain{display:flex;align-items:stretch;gap:8px;margin-top:16px}.link{flex:1;border-radius:16px;background:rgba(16,24,39,.78);border:1px solid var(--line);padding:14px;position:relative}.link:not(:last-child)::after{content:"→";position:absolute;right:-19px;top:50%;transform:translateY(-50%);color:var(--amber);font-size:28px;font-weight:800;z-index:3}.link h4{margin:8px 0}.link p{font-size:var(--fs-xs)}
+.stringMap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.stringMap .tile{min-height:122px}.stringMap .tile b{display:block;margin-bottom:8px;color:var(--ink)}
+.matrix{display:grid;grid-template-columns:1fr 1fr;gap:14px}.matrix .tile{min-height:132px}
+.note{border-radius:16px;padding:16px;border-left:4px solid var(--cyan);background:linear-gradient(90deg,rgba(45,212,191,.11),rgba(16,24,39,.72))}.note.warn{border-left-color:var(--amber);background:linear-gradient(90deg,rgba(251,191,36,.11),rgba(16,24,39,.72))}.note.rose{border-left-color:var(--rose);background:linear-gradient(90deg,rgba(251,113,133,.11),rgba(16,24,39,.72))}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.compare .bad{border-color:rgba(251,113,133,.34)}.compare .good{border-color:rgba(52,211,153,.34)}
+.bigQuote{font-size:var(--fs-lg);line-height:1.35;color:var(--ink);font-weight:650}.bad .bigQuote{color:#fecdd3}.good .bigQuote{color:#bbf7d0}
+
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:9px 18px;background:rgba(5,8,18,.88);border-top:1px solid var(--line);z-index:50}
+.nav .grp{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--line);border-radius:10px;background:rgba(16,24,39,.88);color:var(--ink);font-family:var(--font-display);font-size:var(--fs-xs);font-weight:750;padding:9px 12px}.btn:hover{border-color:var(--cyan);color:var(--cyan)}.btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#03101b;border:none}.btn[disabled]{opacity:.35;pointer-events:none}.scaleVal{font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--ink-muted);min-width:78px;text-align:center}.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:58vw}.dot{width:8px;height:8px;border-radius:99px;background:rgba(148,163,184,.36);transition:.18s}.dot.active{background:var(--cyan);transform:scale(1.45)}.counter{font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--ink-muted);min-width:62px;text-align:center}.navHot{position:fixed;left:0;right:0;bottom:0;height:54px;z-index:49}
+body.fs .nav{opacity:.14;transform:translateY(9px);transition:.25s}body.fs.fsShow .nav,body.fs .nav:hover{opacity:1;transform:translateY(0)}
+
+/* tighter list for final slide */
+.tightList{margin:5px 0 0 16px;padding:0}.tightList li{margin:3px 0;font-size:var(--fs-sm);line-height:1.38}
+/* overflow guard on all slides */
+.slide{overflow:hidden}
+/* compact step variant */
+.timeline.compact .step{min-height:144px}
+.codePanel .lh{display:inline;border-radius:4px;padding:0 2px;transition:background .28s ease,box-shadow .28s ease}
+.codePanel .lh.lit{background:rgba(251,191,36,.18);box-shadow:0 0 0 1px rgba(251,191,36,.45) inset}
+[data-link]{cursor:pointer;transition:transform .22s ease,border-color .25s ease,background .25s ease}
+[data-link].lit{border-color:rgba(251,191,36,.6) !important;transform:translateX(3px);background:rgba(251,191,36,.07)}
+.hintRow{display:flex;align-items:center;gap:8px;font-size:var(--fs-xxs);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;margin-bottom:8px}
+.hintRow::before{content:"";width:18px;height:2px;background:var(--amber);border-radius:99px}
+/* ── staggered entrance animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes trainIn{from{opacity:0;transform:translateX(-26px) scale(.975)}to{opacity:1;transform:translateX(0) scale(1)}}
+/* fact card stagger — direct children of .facts */
+.slide.active .facts>*{animation:fadeUp .36s cubic-bezier(.2,.7,.2,1) both}
+.slide.active .facts>:nth-child(1){animation-delay:.08s}
+.slide.active .facts>:nth-child(2){animation-delay:.18s}
+.slide.active .facts>:nth-child(3){animation-delay:.28s}
+.slide.active .facts>:nth-child(4){animation-delay:.38s}
+.slide.active .facts>:nth-child(5){animation-delay:.48s}
+.slide.active .facts>:nth-child(6){animation-delay:.58s}
+.slide.active .facts>:nth-child(7){animation-delay:.68s}
+.slide.active .facts>:nth-child(8){animation-delay:.78s}
+/* code panel entrance on artifact slides */
+.slide.active .artifactBody .codePanel{animation:fadeUp .40s .04s cubic-bezier(.2,.7,.2,1) both}
+/* chain train — links arrive left-to-right */
+.slide.active .chain .link{animation:trainIn .42s cubic-bezier(.2,.7,.2,1) both}
+.slide.active .chain .link:nth-child(1){animation-delay:.04s}
+.slide.active .chain .link:nth-child(2){animation-delay:.18s}
+.slide.active .chain .link:nth-child(3){animation-delay:.32s}
+.slide.active .chain .link:nth-child(4){animation-delay:.46s}
+.slide.active .chain .link:nth-child(5){animation-delay:.60s}
+/* stringMap tiles settle after chain */
+.slide.active .stringMap .tile{animation:fadeUp .34s cubic-bezier(.2,.7,.2,1) both}
+.slide.active .stringMap .tile:nth-child(1){animation-delay:.76s}
+.slide.active .stringMap .tile:nth-child(2){animation-delay:.86s}
+.slide.active .stringMap .tile:nth-child(3){animation-delay:.96s}
+.slide.active .stringMap .tile:nth-child(4){animation-delay:1.06s}
+/* repo link banner */
+.repoLink{display:flex;align-items:center;gap:14px;margin-top:10px;padding:11px 18px;border-radius:12px;background:rgba(45,212,191,.07);border:1px solid rgba(45,212,191,.30);text-decoration:none;cursor:pointer}
+.repoLink:hover{background:rgba(45,212,191,.13);border-color:rgba(45,212,191,.55)}
+.repoLinkLabel{font-size:var(--fs-xs);color:var(--ink-muted);font-weight:700;letter-spacing:.06em}
+.repoLinkUrl{font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--cyan);font-weight:700;-webkit-user-select:text;user-select:text}
+.repoLinkArrow{margin-left:auto;font-size:var(--fs-lg);color:var(--cyan);opacity:.7}
 </style>
 </head>
 <body>
-<div class="reveal"><div class="slides">
+<div class="hudGrid"></div>
+<div class="stage" id="stage"><div class="deck" id="deck">
 
-<!-- 1 -->
-<section>
-  <h1>Agent Engineering 101</h1>
-  <h3>A 20-minute tour</h3>
-  <p>Running example: <em>teach Copilot to read &amp; triage a FEV log.</em></p>
-  <blockquote>By the end of this talk you can build a mini FEV log-triage agent from scratch.</blockquote>
+<!-- 01 Launch -->
+<section class="slide" data-title="Launch">
+  <div class="hero">
+    <div>
+      <div class="kicker">Agent Engineering 101 · Training</div>
+      <h1 class="heroTitle"><span>Agent</span><span>for FEV</span></h1>
+      <p class="heroSub">An intro training. We build one example end-to-end: a <strong>FEV-Lead master agent</strong> that routes a log to a <strong>Log-Analyzer sub-agent</strong>. <br> Along the way every primitive lands: instructions, skills, agents, prompts, config YAML, MCP, and memory.</p>
+    </div>
+    <div class="metricGrid">
+      <div class="metric"><div class="value">7</div><div class="label">primitives to learn</div></div>
+      <div class="metric"><div class="value">2</div><div class="label">agents in the demo</div></div>
+      <div class="metric"><div class="value">~20</div><div class="label">min walkthrough</div></div>
+    </div>
+  </div>
 </section>
 
-<!-- 2 -->
-<section>
-  <h2>Why are we here?</h2>
-  <p>You've used Copilot Chat. It's smart, but:</p>
-  <ul>
-    <li>It doesn't know what <code>fev_rtl2syn</code> means.</li>
-    <li>It re-asks the same questions every session.</li>
-    <li>It hallucinates paths because it has never seen our ward layout.</li>
-  </ul>
-  <p><strong>Agent engineering</strong> = teaching Copilot your domain <em>once</em>, in files that live next to your code, so every engineer gets the same expert behavior.</p>
+<!-- 02 Why -->
+<section class="slide" data-title="Why">
+  <div class="topbar"><div class="kicker">Why we are here</div><div class="page">02 / 16</div></div>
+  <div class="split">
+    <div class="stack">
+      <h1>Vanilla Copilot is a generalist.<br>Your team needs an AGENT that knows <span class="amber">FEV</span>.</h1>
+      <p class="lede">It doesn't know what <code>fev_rtl2syn</code> means, re-asks the same questions every session, and hallucinates ward paths.<br><strong>Agent engineering</strong> = teaching Copilot your domain <em>once</em>, in files that live next to your code, so every engineer gets the same expert behavior.</p>
+      <div class="note"><p><strong>Talk contract:</strong> by the end you can build a mini FEV log-triage agent from scratch. Seven primitives, one running example, real do/don'ts from the authoring handbook.</p></div>
+    </div>
+    <div class="compare">
+      <div class="card bad glowRose"><h3>Without an agent</h3><p class="bigQuote">"It looks like there is an error somewhere in the log."</p><p class="small muted">Generic. No FEV vocabulary. No run-area awareness. No next action.</p></div>
+      <div class="card good glowGreen"><h3>With this training</h3><p class="bigQuote">Conformal run, <code>flatten_model</code> abort after 7 non-equivalents. Check <code>ivar($task,guidance_file_path)</code>. See <code>reports/compare.rpt</code>.</p><p class="small muted">Domain vocab, likely cause, concrete next step.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- 3 -->
-<section>
-  <h2>What you'll walk away with</h2>
-  <ol>
-    <li>The <strong>five files</strong> that make an agent (and what each one does).</li>
-    <li>The <strong>folder layout</strong> Copilot expects.</li>
-    <li>How the files <strong>interlink</strong> — why splitting matters.</li>
-    <li>A working mini-agent: <code>fev-log-mini</code> — parses a Conformal/Formality log.</li>
-    <li>The most common <strong>good-way vs bad-way</strong> mistakes.</li>
-  </ol>
+<!-- 03 What IS an agent? (orbit) -->
+<section class="slide" data-title="What is an agent">
+  <div class="topbar"><div class="kicker">One concept before the files</div><div class="page">03 / 16</div></div>
+  <div class="split">
+    <div class="stack">
+      <h1>An agent = domain knowledge + tool permissions + persona, assembled from <span class="cyan">small composable files</span>.</h1>
+      <p class="lede">No single file does everything.<br>Each orbiting primitive has <em><b>one job</b></em>.<br>Copilot discovers them by name and description and loads only what the current task needs — nothing is imported.</p>
+      <div class="bento c2" style="margin-top:12px;gap:10px">
+        <div class="tile glowBlue"><span class="chip inst">Instructions</span><p class="small" style="margin-top:6px">Always-on facts</p></div>
+        <div class="tile glowGreen"><span class="chip skill">Skills</span><p class="small" style="margin-top:6px">On-demand procedures</p></div>
+        <div class="tile glowViolet"><span class="chip agent">Agents</span><p class="small" style="margin-top:6px">Master + specialists</p></div>
+        <div class="tile glowAmber"><span class="chip prompt">Prompts</span><p class="small" style="margin-top:6px">User <code>/commands</code></p></div>
+        <div class="tile glowRose"><span class="chip data">Config</span><p class="small" style="margin-top:6px">Living YAML catalogs</p></div>
+        <div class="tile glowCyan"><span class="chip mcp">MCP + Mem</span><p class="small" style="margin-top:6px">Tools + durable context</p></div>
+      </div>
+    </div>
+    <div class="orbit">
+      <div class="core">
+        <p class="xs muted" style="letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">Copilot Agent</p>
+        <h4 style="font-size:var(--fs-lg);color:var(--cyan);margin:4px 0">FEV-Lead</h4>
+        <p class="xs muted">master · user-invocable</p>
+      </div>
+      <div class="node n1">fev-domain<br>.instructions.md</div>
+      <div class="node n2">fev-log-analysis<br>SKILL.md</div>
+      <div class="node n3">log-analyzer<br>.agent.md</div>
+      <div class="node n4">analyze-fev-log<br>.prompt.md</div>
+      <div class="node n5">log-signatures<br>.yaml</div>
+    </div>
+  </div>
 </section>
 
-<!-- 4 -->
-<section>
-  <h2>Mental model: 5 primitives</h2>
-  <table>
-    <thead><tr><th>Primitive</th><th>File</th><th>Job</th><th>Loaded when</th></tr></thead>
-    <tbody>
-      <tr><td><strong>Instructions</strong></td><td><code>*.instructions.md</code></td><td>Always-on domain primer</td><td>Every turn (if <code>applyTo</code> matches)</td></tr>
-      <tr><td><strong>Skill</strong></td><td><code>SKILL.md</code></td><td>A reusable <em>procedure</em></td><td>Auto-loaded by description match</td></tr>
-      <tr><td><strong>Agent</strong></td><td><code>*.agent.md</code></td><td>A persona with tools + a role</td><td>User picks it, or master delegates</td></tr>
-      <tr><td><strong>Sub-agent</strong></td><td><code>*.agent.md</code> + <code>user-invocable: false</code></td><td>A specialist the master calls</td><td>Master invokes via <code>runSubagent</code></td></tr>
-      <tr><td><strong>Prompt</strong></td><td><code>*.prompt.md</code></td><td>A one-click user-facing recipe</td><td>User types <code>/promptname</code></td></tr>
-    </tbody>
-  </table>
-  <blockquote><em>Instructions teach, skills do, agents are personas, prompts are shortcuts.</em></blockquote>
+<!-- 04 Primitives -->
+<section class="slide" data-title="Primitives">
+  <div class="topbar"><div class="kicker">Seven primitives · one sentence each</div><div class="page">04 / 16</div></div>
+  <h1 style="margin-bottom:12px">Pick the smallest primitive that <em>owns</em> the responsibility.</h1>
+  <div class="timeline compact">
+    <div class="step inst" data-step="Teach"><h4>Instructions</h4><p>Always-on facts: vocab, invariants, path rules. Loaded when <code>applyTo</code> glob matches.</p></div>
+    <div class="step skill" data-step="Do"><h4>Skills</h4><p>Reusable multi-step procedure. Auto-loaded by description match. One job per skill.</p></div>
+    <div class="step agent" data-step="Role"><h4>Agents</h4><p>Persona + tool budget. <strong>Master</strong> routes; <strong>sub-agents</strong> specialize and return a structured result.</p></div>
+    <div class="step prompt" data-step="Launch"><h4>Prompts</h4><p>One-click user recipe. User types <code>/name</code>, you collect inputs, delegate.</p></div>
+    <div class="step data" data-step="Evolve"><h4>Config YAML</h4><p>Living knowledge: signatures, page IDs, ward paths, MCP registry, terminology.</p></div>
+  </div>
+  <div class="bento c2" style="margin-top:12px;gap:12px">
+    <div class="card glowCyan" style="padding:13px 16px;flex-direction:row;align-items:center;gap:12px"><span class="chip mcp" style="flex-shrink:0">MCP</span><div><strong class="small">External tool calls</strong><p class="xs muted" style="margin-top:3px">HSDES, Confluence, GitHub — real fetches with citations. Load deferred tools via <code>tool_search</code>.</p></div></div>
+    <div class="card glowGreen" style="padding:13px 16px;flex-direction:row;align-items:center;gap:12px"><span class="chip skill" style="flex-shrink:0">Memory</span><div><strong class="small">Durable context</strong><p class="xs muted" style="margin-top:3px">User · Session · Repo tiers. Stores lessons — not a substitute for citing a fresh source.</p></div></div>
+  </div>
 </section>
 
-<!-- 5 -->
-<section>
-  <h2>The folder layout</h2>
-<div class="ascii">.github/
-├── copilot-instructions.md      # base layer, always on
-├── instructions/                # auto-attached primers (by applyTo)
-│   └── fev-domain.instructions.md
-├── skills/                      # reusable procedures
-│   └── fev-log-analysis/
-│       └── SKILL.md
-├── agents/                      # personas
-│   ├── fev-lead.agent.md        # the master (user-invocable)
-│   └── log-analyzer.agent.md    # a sub-agent
-├── prompts/                     # one-click recipes
-│   └── analyze-fev-log.prompt.md
-└── config/                      # data your agents read
-    └── log-signatures.yaml</div>
-  <p>Copilot only auto-discovers files under <code>.github/</code>. Anything else, you must point to.</p>
+<!-- 05 Folder layout -->
+<section class="slide" data-title="Repository shape">
+  <div class="topbar"><div class="kicker">Where things live</div><div class="page">05 / 16</div></div>
+  <div class="split">
+    <div class="codePanel grow"><span class="c">.github/</span>
+├── <span class="k">copilot-instructions.md</span>        <span class="c"># base layer, always on</span>
+├── <span class="k">instructions/</span>
+│   └── <span class="k">fev-domain.instructions.md</span>    <span class="c"># ← build first (no deps)</span>
+├── <span class="s">skills/</span>
+│   └── <span class="s">fev-log-analysis/</span>
+│       └── <span class="s">SKILL.md</span>               <span class="c"># ← reads config/log-signatures.yaml</span>
+├── <span class="v">agents/</span>
+│   ├── <span class="v">log-analyzer.agent.md</span>      <span class="c"># ← sub-agent, user-invocable: false</span>
+│   └── <span class="v">fev-lead.agent.md</span>           <span class="c"># ← master, user-invocable: true</span>
+├── <span class="y">prompts/</span>
+│   └── <span class="y">analyze-fev-log.prompt.md</span>  <span class="c"># ← build last (all deps exist)</span>
+└── <span class="n">config/</span>
+    └── <span class="n">log-signatures.yaml</span>         <span class="c"># ← build second (no deps)</span>
+
+<span class="c">Each next file references only what is already built.</span></div>
+    <div class="stack">
+      <h1>Copilot auto-discovers under <code>.github/</code> only.</h1>
+      <p class="lede">Folder names are recognized conventions. Composition happens via <em>descriptions</em>, not imports. Build in dependency order so every reference is valid.</p>
+      <div class="stack" style="gap:10px;margin-top:8px">
+        <div class="tile glowCyan"><h4>Build order for this deck</h4><p>Instruction → Config YAML → Skill → Sub-agent → Master → Prompt. Each references only files that already exist.</p></div>
+        <div class="tile glowAmber"><h4>One root file only</h4><p>Pick <code>AGENTS.md</code> or <code>copilot-instructions.md</code> — never both. They compete for context.</p></div>
+        <div class="tile glowGreen"><h4>Reviewable knowledge</h4><p>New signatures land as YAML PR diffs, not buried inside agent bodies.</p></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- 6 -->
-<section>
-  <h2>Running example: "Parse this FEV log"</h2>
-  <p>A FEV engineer pastes:</p>
-<pre><code class="hljs">Comparing... compare points = 1234
-Non-equivalent points = 7
-ERROR: abort in flatten_model</code></pre>
-  <p>Without an agent: <em>"It looks like there's an error."</em></p>
-  <p>With an agent:</p>
-  <blockquote>Conformal run, hit <code>flatten_model</code> abort after detecting 7 non-equivalent points. Likely cause: missing UPF or guidance file. Check <code>ivar($task,guidance_file_path)</code> in your ward's <code>vars.tcl</code>. See <code>reports/compare.rpt</code> for the 7 mismatches.</blockquote>
-  <p>That difference = <strong>5 small files</strong> working together.</p>
+<!-- 06 YAML anatomy -->
+<section class="slide" data-title="Anatomy">
+  <div class="topbar"><div class="kicker">YAML frontmatter contract · <span class="muted">click a card to highlight the field</span></div><div class="page">06 / 16</div></div>
+  <div class="artifact grow">
+    <div class="artifactHead"><div class="artifactName">frontmatter = API &nbsp;·&nbsp; body = behavior &nbsp;·&nbsp; every file type has both</div><span class="chip mcp">discovery layer</span></div>
+    <div class="artifactBody">
+      <div class="codePanel"><span class="c">--- machine-readable YAML frontmatter</span>
+<span class="lh" data-hl="applyTo"><span class="k">applyTo</span>: <span class="s">'**'</span>                              <span class="c"># attachment scope</span></span>
+<span class="lh" data-hl="description"><span class="k">description</span>: <span class="s">'FEV vocab — always loaded.'</span>   <span class="c"># search key</span></span>
+<span class="lh" data-hl="tools"><span class="k">tools</span>: [<span class="n">read/readFile</span>, <span class="n">search/codebase</span>]   <span class="c"># allowed tools</span></span>
+<span class="lh" data-hl="agents"><span class="k">agents</span>: [<span class="v">log-analyzer</span>]                    <span class="c"># allowed sub-agents</span></span>
+<span class="lh" data-hl="userinv"><span class="k">user-invocable</span>: <span class="y">false</span>                    <span class="c"># show/hide in picker</span></span>
+<span class="c">---</span>
+
+<span class="c"># Body — plain Markdown instructions</span>
+
+<span class="lh" data-hl="body"><span class="c">## When to use</span>
+- "analyze this lec.log"
+- "why did Formality abort?"
+
+<span class="c">## Procedure</span>
+1. Detect the tool from the header.
+2. Match signatures against the YAML catalog.
+3. Build a milestone timeline.</span></div>
+      <div class="facts">
+        <div class="hintRow">Click a card to highlight the field</div>
+        <div class="fact glowBlue" data-link="applyTo"><b>applyTo</b><p>Glob for auto-attach. <code>'**'</code> = every turn — only for true global facts.</p></div>
+        <div class="fact glowCyan" data-link="description"><b>description</b><p>The search key. Bad wording = silent non-use. Write it like a trigger list.</p></div>
+        <div class="fact glowAmber" data-link="tools"><b>tools</b><p>Minimum needed. Research agents never see <code>execute</code> or write tools.</p></div>
+        <div class="fact glowViolet" data-link="agents"><b>agents</b><p>Sub-agent allow-list. Limits blast radius on the master.</p></div>
+        <div class="fact glowRose" data-link="userinv"><b>user-invocable</b><p><code>false</code> hides from picker. Use on every specialist sub-agent.</p></div>
+        <div class="fact glowGreen" data-link="body"><b>body</b><p>Behavior. Short + structured: <code>## When to use</code>, <code>## Procedure</code>, <code>## Output Format</code>.</p></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- 7 -->
-<section>
-  <h2>File #1: the instruction file</h2>
-  <p><code>.github/instructions/fev-domain.instructions.md</code></p>
-<pre><code class="language-markdown" data-trim>---
-applyTo: '**'
-description: 'FEV vocabulary — always loaded.'
----
-
-# FEV domain primer
-
-- Conformal LEC log → `logs/lec.log`. Formality log → `logs/fm.log`.
-- Run-area pattern: `$ward/runs/$block/$tech/$flow/$task`
-- "Non-equivalent" = a compare point where golden ≠ revised.
-- "Abort" = tool gave up. Always look at the line *before* the abort.
-- iVAR `ivar($task,guidance_file_path)` = vsdc (Conformal) or SVF (Formality).
-</code></pre>
-  <p><strong>Purpose</strong>: always in context. Copilot now <em>knows what we mean</em>.</p>
+<!-- 07 Build arc -->
+<section class="slide" data-title="Build arc">
+  <div class="topbar"><div class="kicker">Build order · each file references only what is already built</div><div class="page">07 / 16</div></div>
+  <div class="split reverse">
+    <div class="stack">
+      <h1>Start thin. Layer up only after the smoke test passes.</h1>
+      <p class="lede">Handbook rule: one vertical slice before a hierarchy.<br>Don't create ten agents before one has done real work.<br>Our slice: pasted log in → structured triage out.</p>
+      <div class="note" style="margin-top:8px"><p><strong>Definition of done:</strong> FEV-Lead routes to Log-Analyzer, the skill auto-loads, the YAML catalog is consulted, unknown lines become catalog candidates instead of being silently dropped.</p></div>
+    </div>
+    <div class="timeline vertical">
+      <div class="step inst" data-step="01"><h4>Instruction</h4><p><code>fev-domain.instructions.md</code> — vocabulary, log paths, run-area, iVARs. References nothing.</p></div>
+      <div class="step data" data-step="02"><h4>Config YAML</h4><p><code>log-signatures.yaml</code> — milestones, errors, correlations. References nothing.</p></div>
+      <div class="step skill" data-step="03"><h4>Skill</h4><p><code>fev-log-analysis/SKILL.md</code> — reads <code>config/log-signatures.yaml</code>. ✓ Built.</p></div>
+      <div class="step agent" data-step="04"><h4>Sub-agent</h4><p><code>log-analyzer.agent.md</code> — invokes <code>fev-log-analysis</code> skill. ✓ Built.</p></div>
+      <div class="step agent" data-step="05"><h4>Master agent</h4><p><code>fev-lead.agent.md</code> — calls <code>runSubagent("log-analyzer")</code>. ✓ Built.</p></div>
+      <div class="step prompt" data-step="06"><h4>Prompt</h4><p><code>/analyze-fev-log</code> — invokes <code>FEV-Lead</code>. ✓ Everything above exists.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- 8 -->
-<section>
-  <h2>Good vs bad: instruction files</h2>
-  <table>
-    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
-    <tbody>
-      <tr><td>50 lines of dense vocab + a few hard rules.</td><td>800-line essay copy-pasted from the wiki.</td></tr>
-      <tr><td><code>applyTo: '**'</code> for true global facts.</td><td><code>applyTo: '**'</code> for project-specific stuff (bloats every turn).</td></tr>
-      <tr><td>Names canonical paths (<code>logs/lec.log</code>).</td><td>Vague: "logs are usually in the build dir."</td></tr>
-      <tr><td>One file per topic.</td><td>Mega-file mixing 6 topics.</td></tr>
-    </tbody>
-  </table>
-  <p><strong>Why it matters</strong>: instructions load <em>every turn</em>. Bloat = slower, dumber answers.</p>
+<!-- 08 File 1: Instruction -->
+<section class="slide" data-title="Instruction">
+  <div class="topbar"><div class="kicker"><span class="chip inst">File 1 of 6 · Instruction</span> · <span class="muted">click a card to highlight</span></div><div class="page">08 / 16</div></div>
+  <div class="artifact grow">
+    <div class="artifactHead"><div class="artifactName">.github/instructions/fev-domain.instructions.md</div><span class="chip inst">always-on primer · no dependencies</span></div>
+    <div class="artifactBody">
+      <div class="codePanel"><span class="lh" data-hl="i-fm"><span class="c">---</span>
+<span class="k">applyTo</span>: <span class="s">'**'</span>
+<span class="k">description</span>: <span class="s">'FEV vocabulary — always loaded.'</span>
+<span class="c">---</span></span>
+
+<span class="c"># FEV domain primer</span>
+
+<span class="lh" data-hl="i-logs">- Conformal LEC log → <span class="n">`logs/lec.log`</span>
+- Formality log     → <span class="n">`logs/fm.log`</span></span>
+<span class="lh" data-hl="i-run">- Run-area: <span class="n">`$ward/runs/$block/$tech/$flow/$task`</span></span>
+<span class="lh" data-hl="i-vocab">- "Non-equivalent" = golden ≠ revised.
+- "Abort" = tool gave up; check the line before.</span>
+<span class="lh" data-hl="i-ivar">- iVAR <span class="n">`ivar($task,guidance_file_path)`</span>
+    = vsdc (Conformal) or SVF (Formality).</span></div>
+      <div class="facts">
+        <div class="hintRow">Click to highlight</div>
+        <div class="fact glowBlue" data-link="i-fm"><b>Frontmatter</b><p><code>applyTo: '**'</code> auto-loads every turn. Cheap because the body is dense and short — not 800 lines of wiki paste.</p></div>
+        <div class="fact glowCyan" data-link="i-logs"><b>Canonical log paths</b><p>Two lines. Copilot stops guessing where the log lives.</p></div>
+        <div class="fact glowAmber" data-link="i-run"><b>Run-area pattern</b><p>Plural <code>runs</code>, four variables — prevents a whole class of hallucinated paths.</p></div>
+        <div class="fact glowViolet" data-link="i-vocab"><b>FEV vocabulary</b><p><em>Non-equivalent</em>, <em>abort</em> — exact meaning to FEV engineers, nothing to vanilla Copilot.</p></div>
+        <div class="fact glowGreen" data-link="i-ivar"><b>iVAR mapping</b><p>Which knob to inspect when guidance is missing. One iVAR, two tools.</p></div>
+        <div class="doDont">
+          <div class="fact"><b>Do</b><p>Short, exact, scoped. Use "prefer / when / unless".</p></div>
+          <div class="fact"><b>Don't</b><p>Paste the wiki. Duplicate <code>AGENTS.md</code>. Stuff trivia behind <code>applyTo: '**'</code>.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- 9 -->
-<section>
-  <h2>File #2: the skill</h2>
-  <p><code>.github/skills/fev-log-analysis/SKILL.md</code></p>
-<pre><code class="language-markdown" data-trim>---
-name: fev-log-analysis
-description: Parse Conformal/Formality logs, build a timeline,
-             find first abort, correlate to reports.
----
+<!-- 09 File 2: Config YAML -->
+<section class="slide" data-title="Config YAML">
+  <div class="topbar"><div class="kicker"><span class="chip data">File 2 of 6 · Config YAML</span> · <span class="muted">click a card to highlight</span></div><div class="page">09 / 16</div></div>
+  <div class="artifact grow">
+    <div class="artifactHead"><div class="artifactName">.github/config/log-signatures.yaml</div><span class="chip data">living catalog · no dependencies · read explicitly by the skill</span></div>
+    <div class="artifactBody">
+    <div class="codePanel grow"><span class="c"># .github/config/log-signatures.yaml</span>
+<span class="c"># Read explicitly by the skill. Not auto-loaded.</span>
 
-# Skill: fev-log-analysis
+<span class="k">conformal</span>:
+  <span class="k">log_file</span>: <span class="s">"logs/lec.log"</span>
+  <span class="k">banner_patterns</span>: [<span class="s">"Conformal"</span>, <span class="s">"LEC&gt;"</span>]
+<span class="lh" data-hl="y-milestones">  <span class="k">milestones</span>:
+    - { <span class="k">id</span>: <span class="n">mapping_done</span>,
+        <span class="k">pattern</span>: <span class="s">"Mapping complete"</span>,
+        <span class="k">meaning</span>: <span class="s">"Key-point mapping done."</span> }</span>
+<span class="lh" data-hl="y-errors">  <span class="k">errors</span>:
+    - { <span class="k">id</span>: <span class="n">non_equiv</span>,
+        <span class="k">pattern</span>: <span class="s">"Non-equivalent|NEQ\\b"</span>,
+        <span class="k">meaning</span>: <span class="s">"Compare points differ."</span>,
+        <span class="k">correlation</span>: <span class="s">"reports/ + violation_rpts/"</span> }
+    - { <span class="k">id</span>: <span class="n">flatten_abort</span>,
+        <span class="k">pattern</span>: <span class="s">"abort in flatten_model"</span>,
+        <span class="k">meaning</span>: <span class="s">"Missing UPF or guidance file."</span>,
+        <span class="k">correlation</span>: <span class="s">"check ivar(guidance_file_path)"</span> }</span>
 
-## When to use
-- "Analyze this lec.log."
-- "Why did Formality abort?"
-
-## Procedure
-1. Detect tool from header (Conformal banner vs Formality banner).
-2. Match each line against signatures in `config/log-signatures.yaml`.
-3. Build a milestone timeline (line numbers).
-4. Find the first ERROR / abort; show ±10 lines.
-5. Suggest the next move (check iVAR, search HSD, etc.).
-</code></pre>
-  <p>Any agent with the right tools auto-invokes this. The <code>description</code> is a <strong>search key</strong>.</p>
+<span class="lh" data-hl="y-inspect"><span class="k">inspect_fev</span>:
+  <span class="k">pre_waiver</span>: <span class="s">"results/InspectFEV_SUMMARY.rpt"</span>
+  <span class="k">violations</span>: <span class="s">"outputs/violation_rpts/"</span></span></div>
+    <div class="facts">
+      <div class="hintRow">Click to highlight</div>
+      <div class="fact glowBlue" data-link="y-milestones"><b>Milestones vs errors</b><p>Two separate arrays. Milestones are positive waypoints; errors each carry a <code>correlation</code> field naming the report to open.</p></div>
+      <div class="fact glowAmber" data-link="y-errors"><b>Schema discipline</b><p>Every error entry: <code>id</code>, <code>pattern</code>, <code>meaning</code>, <code>correlation</code>. Treat schema changes like API changes.</p></div>
+      <div class="fact glowCyan" data-link="y-inspect"><b>InspectFEV outputs</b><p>Pre-waiver report and violation folder — the skill reads both to correlate log findings to audit results.</p></div>
+      <div class="doDont">
+        <div class="fact"><b>Do</b><p>Add entries as small PR diffs. Log-Analyzer proposes paste-ready YAML for unrecognized lines.</p></div>
+        <div class="fact"><b>Don't</b><p>Hardcode evolving regexes into agent bodies. That creates hidden duplication across files.</p></div>
+      </div>
+      <div class="note warn"><p><strong>Catalog rule:</strong> never silently ignore an unrecognized line. Always propose it as a new entry.</p></div>
+    </div>
+  </div>
+  </div>
 </section>
 
-<!-- 10 -->
-<section>
-  <h2>Good vs bad: skills</h2>
-  <table>
-    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
-    <tbody>
-      <tr><td>Description names trigger phrases: "parse log", "find abort".</td><td>Description says "helps with FEV stuff."</td></tr>
-      <tr><td>Numbered, deterministic procedure.</td><td>"Use your judgment to analyze the log."</td></tr>
-      <tr><td>Points to <strong>data files</strong> so the catalog can grow.</td><td>Hardcodes 200 regexes inline.</td></tr>
-      <tr><td>One skill = one job.</td><td>One skill that "parses logs, opens HSDs, writes BKMs".</td></tr>
-    </tbody>
-  </table>
+<!-- 10 File 3: Skill -->
+<section class="slide" data-title="Skill">
+  <div class="topbar"><div class="kicker"><span class="chip skill">File 3 of 6 · Skill</span> · <span class="muted">click a card to highlight</span></div><div class="page">10 / 16</div></div>
+  <div class="artifact grow">
+    <div class="artifactHead"><div class="artifactName">.github/skills/fev-log-analysis/SKILL.md</div><span class="chip skill">reusable procedure · reads log-signatures.yaml (file 2)</span></div>
+    <div class="artifactBody">
+      <div class="codePanel"><span class="c">---</span>
+<span class="lh" data-hl="sk-name"><span class="k">name</span>: <span class="s">fev-log-analysis</span>      <span class="c"># must match folder name exactly</span></span>
+<span class="lh" data-hl="sk-desc"><span class="k">description</span>: <span class="s">Parse Conformal/Formality logs, build a</span>
+             <span class="s">milestone timeline, find first abort,</span>
+             <span class="s">correlate to reports. Triggers: "analyze</span>
+             <span class="s">log", "abort", "non-equivalent", "ERROR".</span></span>
+<span class="c">---</span>
+
+<span class="c">## Procedure</span>
+1. Detect tool from banner.
+<span class="lh" data-hl="sk-ref">2. Match lines against
+   <span class="n">`../../config/log-signatures.yaml`</span>. <span class="c"># ← file 2 ✓</span></span>
+3. Build a milestone timeline.
+4. Show first ERROR / abort with ±10 lines.
+5. Suggest one next move.</div>
+      <div class="facts">
+        <div class="hintRow">Click to highlight</div>
+        <div class="fact glowBlue" data-link="sk-name"><b>Folder name = <code>name:</code> field</b><p>Mismatch is the #1 silent skill bug. The folder <code>fev-log-analysis/</code> must match exactly.</p></div>
+        <div class="fact glowCyan" data-link="sk-desc"><b>Description = discovery surface</b><p>Copilot sees only <code>name</code> + <code>description</code> first. Trigger-rich wording earns the load.</p></div>
+        <div class="fact glowGreen" data-link="sk-ref"><b>References file 2</b><p>Reads <code>log-signatures.yaml</code> by relative path. That file already exists — reference is always valid.</p></div>
+        <div class="doDont">
+          <div class="fact"><b>Do</b><p>Trigger-rich description. Deterministic numbered steps. Catalog referenced by relative path.</p></div>
+          <div class="fact"><b>Don't</b><p>Make a prompt disguised as a skill. Inline 200 regexes. Write "use your judgment".</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- 11 -->
-<section>
-  <h2>File #3: the master agent</h2>
-  <p><code>.github/agents/fev-lead.agent.md</code></p>
-<pre><code class="language-markdown" data-trim>---
-description: 'FEV-Lead — entry point for FEV triage. Routes to specialists.'
-tools: [read/readFile, search/codebase, agent/runSubagent]
-agents: [log-analyzer]      # allow-list of sub-agents
-user-invocable: true
----
+<!-- 11 File 4: Sub-agent -->
+<section class="slide" data-title="Sub-agent">
+  <div class="topbar"><div class="kicker"><span class="chip agent">File 4 of 6 · Sub-agent · Log-Analyzer</span> · <span class="muted">click a card to highlight</span></div><div class="page">11 / 16</div></div>
+  <div class="artifact grow">
+    <div class="artifactHead"><div class="artifactName">.github/agents/log-analyzer.agent.md</div><span class="chip agent">hidden specialist · invokes fev-log-analysis skill (file 3)</span></div>
+    <div class="artifactBody">
+      <div class="codePanel"><span class="c">---</span>
+<span class="lh" data-hl="sa-desc"><span class="k">description</span>: <span class="s">'Log-Analyzer — parses lec.log / fm.log,</span>
+              <span class="s">correlates to reports/ and InspectFEV.</span>
+              <span class="s">Triggers: "log","abort","non-equivalent".'</span></span>
+<span class="lh" data-hl="sa-tools"><span class="k">tools</span>: [<span class="n">read/readFile</span>, <span class="n">search/textSearch</span>, <span class="n">search/fileSearch</span>]</span>
+<span class="lh" data-hl="sa-inv"><span class="k">user-invocable</span>: <span class="y">false</span>            <span class="c"># hidden — master calls it</span></span>
+<span class="c">---</span>
 
-# FEV-Lead
+<span class="lh" data-hl="sa-inputs"><span class="c">## Inputs</span>
+- run-area: <span class="n">$ward/runs/$block/$tech/$flow/$task</span>
+- log: <span class="n">logs/lec.log</span> / <span class="n">logs/fm.log</span>  or  pasted excerpt</span>
 
-You are the entry point. On every turn:
-1. Classify the user's intent.
-2. Announce which sub-agent will handle it.
-3. Call `runSubagent(name="log-analyzer", prompt="<scoped task>")`.
-4. Cite results.
-
-## Available sub-agents
-- `log-analyzer` — when user says "log / abort / non-equivalent / failure".
-</code></pre>
-  <p>The one visible persona. It does no real work — it <strong>routes</strong>.</p>
+<span class="lh" data-hl="sa-output"><span class="c">## Output contract (required — sub-agents are stateless)</span>
+TOOL / TIMELINE / FIRST_FAIL / NEXT_STEP</span></div>
+      <div class="facts">
+        <div class="hintRow">Click to highlight</div>
+        <div class="fact glowCyan" data-link="sa-desc"><b>Trigger-rich description</b><p>The master's routing table matches against these exact words. Weak wording = missed routing.</p></div>
+        <div class="fact glowAmber" data-link="sa-tools"><b>Minimum tool budget</b><p>Read + search only. No write, no execute. Keeps blast radius small for a read-only specialist.</p></div>
+        <div class="fact glowRose" data-link="sa-inv"><b>Hidden from picker</b><p><code>user-invocable: false</code> on every specialist. One entry point visible to users.</p></div>
+        <div class="fact glowBlue" data-link="sa-inputs"><b>References files 1, 2, 3</b><p>Uses vocabulary from file 1, accepts paths from the run-area pattern, invokes skill (file 3) which reads catalog (file 2).</p></div>
+        <div class="fact glowViolet" data-link="sa-output"><b>Output contract is mandatory</b><p>Sub-agents are stateless — one prompt in, one structured answer out. Master must parse it.</p></div>
+        <div class="doDont">
+          <div class="fact"><b>Do</b><p>One role, minimum tools, explicit output format, trigger words in description.</p></div>
+          <div class="fact"><b>Don't</b><p>Converse with the user. Return one result. No circular handoffs. No slash prompts.</p></div>
+        </div>
+        <div class="note warn"><p><strong>Sub-agents ≠ prompts.</strong> Reusable multi-step logic inside a sub-agent belongs in a skill.</p></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- 12 -->
-<section>
-  <h2>File #4: the sub-agent</h2>
-  <p><code>.github/agents/log-analyzer.agent.md</code></p>
-<pre><code class="language-markdown" data-trim>---
-description: 'Log-Analyzer — parses lec.log / fm.log.
-              Triggers: "log", "abort", "non-equivalent", "ERROR".'
-tools: [read/readFile, search/textSearch, search/fileSearch]
-user-invocable: false
----
+<!-- 12 File 5: Master agent -->
+<section class="slide" data-title="Master agent">
+  <div class="topbar"><div class="kicker"><span class="chip agent">File 5 of 6 · Master · FEV-Lead</span> · <span class="muted">click a card to highlight</span></div><div class="page">12 / 16</div></div>
+  <div class="split">
+    <div class="artifact">
+      <div class="artifactHead"><div class="artifactName">.github/agents/fev-lead.agent.md</div><span class="chip agent">visible orchestrator · routes to log-analyzer (file 4)</span></div>
+      <div class="artifactBody narrow"><div class="codePanel"><span class="c">---</span>
+<span class="lh" data-hl="ma-desc"><span class="k">description</span>: <span class="s">'FEV-Lead — entry point for FEV triage.</span>
+              <span class="s">Routes to specialists. Start here.'</span></span>
+<span class="lh" data-hl="ma-tools"><span class="k">tools</span>: [<span class="n">read/readFile</span>, <span class="n">search/codebase</span>, <span class="n">agent/runSubagent</span>]</span>
+<span class="lh" data-hl="ma-agents"><span class="k">agents</span>: [<span class="v">log-analyzer</span>]  <span class="c"># allow-list — file 4 ✓</span></span>
+<span class="lh" data-hl="ma-inv"><span class="k">user-invocable</span>: <span class="y">true</span></span>
+<span class="c">---</span>
 
-# Log-Analyzer
+<span class="lh" data-hl="ma-body">On first turn: greet, list capabilities, then wait.
+On every turn:
+1. Classify intent.
+2. Announce which sub-agent handles it.
+3. Call <span class="n">runSubagent("log-analyzer", "&lt;task&gt;")</span>.
+4. Cite result.</span>
 
-You analyze FEV logs using the `fev-log-analysis` skill.
-
-## Output contract
-TOOL:        conformal | formality
-TIMELINE:    &lt;line-numbered milestones&gt;
-FIRST_FAIL:  &lt;line N + ±10 context&gt;
-NEXT_STEP:   &lt;suggested action&gt;
-</code></pre>
-  <p>Narrow specialist. Never shows up in chat picker. Master-only.</p>
-  <blockquote>Sub-agents are <strong>stateless</strong>. One prompt in, one structured answer out.</blockquote>
+<span class="lh" data-hl="ma-routing"><span class="c">## Routing table</span>
+"log"|"abort"|"non-equivalent" → <span class="v">log-analyzer</span></span></div></div>
+    </div>
+    <div class="stack">
+      <div class="hintRow">Click to highlight</div>
+      <div class="tile glowViolet" data-link="ma-tools"><h4>Master does no real work</h4><p>It <em>routes and synthesizes</em>. Tool budget is tiny: read, search, runSubagent.</p></div>
+      <div class="tile glowGreen" data-link="ma-body"><h4>First turn = onboarding</h4><p>Greet, list sub-agents, wait. Users discover capabilities without reading any docs.</p></div>
+      <div class="tile glowAmber" data-link="ma-agents"><h4>Effective capability = union</h4><p>Audit master tools + all callable sub-agents' tools together.</p></div>
+      <div class="tile glowRose" data-link="ma-routing"><h4>Start with one sub-agent</h4><p>Allow-list = <code>[log-analyzer]</code> only. Add HSD/Wiki/Ward after the smoke test passes.</p></div>
+      <div class="note warn" style="margin-top:2px"><p><strong>Don't</strong> give the master every tool — that's the swiss-army antipattern.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- 13 -->
-<section>
-  <h2>Good vs bad: agents</h2>
-  <table>
-    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
-    <tbody>
-      <tr><td>Master = router with 1–2 tools. Sub = specialist with focused tools.</td><td>One mega-agent doing everything.</td></tr>
-      <tr><td>Sub-agent description reads like a <strong>trigger list</strong>.</td><td>Generic ("a helpful assistant for FEV").</td></tr>
-      <tr><td>Master has an <code>agents:</code> allow-list.</td><td>Master can call anything, anywhere.</td></tr>
-      <tr><td>Explicit output contract.</td><td>Free-form prose that breaks downstream parsing.</td></tr>
-    </tbody>
-  </table>
-  <p><strong>The trap</strong>: too many tools is worse than too few. Pick the minimum.</p>
-</section>
-
-<!-- 14 -->
-<section>
-  <h2>File #5: the prompt</h2>
-  <p><code>.github/prompts/analyze-fev-log.prompt.md</code></p>
-<pre><code class="language-markdown" data-trim>---
-mode: agent
-description: 'Analyze a FEV log: timeline + first failure + next step.'
----
+<!-- 13 File 6: Prompt -->
+<section class="slide" data-title="Prompt">
+  <div class="topbar"><div class="kicker"><span class="chip prompt">File 6 of 6 · Prompt</span></div><div class="page">13 / 16</div></div>
+  <div class="split">
+    <div class="artifact">
+      <div class="artifactHead"><div class="artifactName">.github/prompts/analyze-fev-log.prompt.md</div><span class="chip prompt">slash command · invokes FEV-Lead (file 5)</span></div>
+      <div class="artifactBody narrow"><div class="codePanel"><span class="c">---</span>
+<span class="k">mode</span>: <span class="s">agent</span>
+<span class="k">description</span>: <span class="s">'Analyze a FEV log: timeline + first</span>
+             <span class="s">failure + next step.'</span>
+<span class="c">---</span>
 
 Log: **${input:log_path_or_excerpt}**
 
-Invoke `FEV-Lead` and ask it to analyze the log above using the
-`fev-log-analysis` skill. Render:
-- timeline
+Invoke <span class="n">`FEV-Lead`</span> and ask it to analyze the log
+above using the <span class="n">`fev-log-analysis`</span> skill. Render:
+- milestone timeline (line-numbered)
 - first failure block (±10 lines)
-- one suggested next step
-</code></pre>
-  <p>User types <code>/analyze-fev-log</code>, gets prompted for a path, and the machinery fires.</p>
-  <blockquote>Prompts are <strong>user-facing</strong>. Sub-agents cannot run prompts — for that, use a skill.</blockquote>
+- one concrete next step</div></div>
+    </div>
+    <div class="stack">
+      <h1>A prompt is a one-click launch surface.</h1>
+      <p class="lede">The user types <code>/analyze-fev-log</code>, provides the log, and all six files fire in sequence. They never need to know any agent or skill names.</p>
+      <div class="bento c2" style="margin-top:8px;gap:10px">
+        <div class="tile glowGreen"><h4>Do</h4><p>One job. Typed <code>${input:…}</code> vars. Explicit handoff. Confirm before edits.</p></div>
+        <div class="tile glowRose"><h4>Don't</h4><p>Multi-turn (use a skill). Re-implement skill inline. Grant <code>execute</code> when only <code>read</code> needed.</p></div>
+      </div>
+      <div class="note" style="margin-top:8px"><p><strong>Prompts are user-only.</strong> Sub-agents cannot run slash prompts. Reusable sub-agent logic belongs in a skill.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- 15 -->
-<section>
-  <h2>How they interlink</h2>
-<div class="ascii">User types /analyze-fev-log
-        │
-        ▼
-┌─────────────────────────┐
-│  analyze-fev-log.prompt │  (the recipe)
-└──────────┬──────────────┘
-           │ "invoke FEV-Lead"
-           ▼
-┌─────────────────────────┐
-│  FEV-Lead (agent)       │  (the router)
-└──────────┬──────────────┘
-           │ runSubagent("log-analyzer", ...)
-           ▼
-┌─────────────────────────┐
-│  Log-Analyzer (sub)     │  (the specialist)
-└──────────┬──────────────┘
-           │ auto-loads
-           ▼
-┌─────────────────────────┐    reads
-│  fev-log-analysis SKILL │ ───────► config/log-signatures.yaml
-└─────────────────────────┘
-
-ALWAYS in context (every turn):
-   fev-domain.instructions.md   (the primer)</div>
-  <p><strong>Key insight</strong>: each file does ONE thing. They compose via <em>descriptions</em>, not imports.</p>
+<!-- 14 Chaining -->
+<section class="slide" data-title="Chaining">
+  <div class="topbar"><div class="kicker">How all six files link up</div><div class="page">14 / 16</div></div>
+  <h1>Files chain by <span class="amber">names and descriptions</span>, not by imports.</h1>
+  <div class="chain">
+    <div class="link glowAmber"><span class="chip prompt">Prompt</span><h4>/analyze-fev-log</h4><p>User types it.</p></div>
+    <div class="link glowViolet"><span class="chip agent">Master</span><h4>FEV-Lead</h4><p>Classifies + delegates.</p></div>
+    <div class="link glowViolet"><span class="chip agent">Sub-agent</span><h4>Log-Analyzer</h4><p>Owns log analysis.</p></div>
+    <div class="link glowGreen"><span class="chip skill">Skill</span><h4>fev-log-analysis</h4><p>Procedure contract.</p></div>
+    <div class="link glowRose"><span class="chip data">YAML</span><h4>log-signatures</h4><p>Growing knowledge.</p></div>
+  </div>
+  <div class="stringMap">
+    <div class="tile glowViolet"><b><span class="mono">agents: [...]</span></b><p>Allow-list. Master can only summon what is listed here.</p></div>
+    <div class="tile glowBlue"><b><span class="mono">description:</span></b><p>Discovery surface. Use trigger words users actually type.</p></div>
+    <div class="tile glowGreen"><b><span class="mono">name == folder</span></b><p>Skills fail silently when folder diverges from <code>name:</code>.</p></div>
+    <div class="tile glowRose"><b><span class="mono">user-invocable</span></b><p>Hide implementation agents; one entry point visible.</p></div>
+  </div>
+  <div class="note rose"><p><strong>When a chain breaks, Copilot gives no error.</strong> The next file simply does not load. Wording discipline matters more than cleverness.</p></div>
 </section>
 
-<!-- 16 -->
-<section>
-  <h2>Discovery: how Copilot finds your stuff</h2>
-  <table>
-    <thead><tr><th>File</th><th>How it loads</th></tr></thead>
-    <tbody>
-      <tr><td><code>copilot-instructions.md</code></td><td>Always, no matching needed.</td></tr>
-      <tr><td><code>*.instructions.md</code></td><td>Auto-attached if <code>applyTo</code> glob matches.</td></tr>
-      <tr><td><code>SKILL.md</code></td><td>Model picks it when <code>description</code> matches the task.</td></tr>
-      <tr><td><code>*.agent.md</code> (user-invocable)</td><td>User picks from chat agent menu.</td></tr>
-      <tr><td><code>*.agent.md</code> (sub-agent)</td><td>Master calls by name via <code>runSubagent</code>.</td></tr>
-      <tr><td><code>*.prompt.md</code></td><td>User types <code>/promptname</code>.</td></tr>
-      <tr><td><code>config/*.yaml</code></td><td>Only when an agent/skill explicitly reads the file.</td></tr>
-    </tbody>
-  </table>
-  <blockquote><strong>Descriptions are the API.</strong> They're how Copilot decides what to load.</blockquote>
+<!-- 15 MCP + Memory -->
+<section class="slide" data-title="MCP + Memory">
+  <div class="topbar"><div class="kicker"><span class="chip mcp">Layers 6 and 7 · MCP + Memory</span></div><div class="page">15 / 16</div></div>
+  <div class="split reverse">
+    <div class="stack">
+      <h1>The slice gets stronger when agents can <span class="cyan">act on real data</span> and <span class="green">remember</span>.</h1>
+      <p class="lede"><strong>MCP</strong> = live tool calls to source-of-truth systems (HSDES tickets, Confluence BKMs).<br><strong>Memory</strong> = durable lessons across turns and sessions. Both need scope discipline to avoid bloat.</p>
+      <div class="doDont" style="margin-top:10px">
+        <div class="fact"><b>Do</b><p>Document expected MCPs in <code>AGENTS.md</code>. Print capability summary first turn. Cite HSD field or wiki title + URL.</p></div>
+        <div class="fact"><b>Don't</b><p>Invent MCP tool names — use <code>tool_search</code>. Paraphrase tool results. Grant write-MCP to read-only personas.</p></div>
+      </div>
+    </div>
+    <div class="bento c2">
+      <div class="tile glowCyan"><span class="chip mcp">HSDES</span><h4>Ticket source-of-truth</h4><p><code>get_hsd_article</code> · <code>search_hsd</code> · <code>skill_root_cause</code></p></div>
+      <div class="tile glowBlue"><span class="chip mcp">Confluence</span><h4>BKMs &amp; methodology</h4><p><code>confluence_search</code> · <code>get_page</code> · <code>get_page_children</code></p></div>
+      <div class="tile glowGreen"><span class="chip skill">Memory scopes</span><h4>Three tiers</h4><p>User · Session · Repo. Each has different persistence and intended content.</p></div>
+      <div class="tile glowAmber"><span class="chip prompt">Scope discipline</span><h4>Memory ≠ citation</h4><p>Memory stores lessons. Always fetch a fresh page for factual answers.</p></div>
+    </div>
+  </div>
 </section>
 
-<!-- 17 -->
-<section>
-  <h2>The two killer mistakes</h2>
-  <h3 class="bad">A. Overfitting</h3>
-  <p>500-line agent that knows your exact ward, your exact block, your exact tag.<br>
-  → Nobody else can use it. You built a script, not an agent.</p>
-  <p><strong>Fix</strong>: parameterize via inputs &amp; config files. Keep the agent generic; put project-specific data in <code>config/</code>.</p>
-  <h3 class="bad">B. Underfitting</h3>
-  <p>"You are a helpful FEV assistant. Help the user."<br>
-  → It does nothing the base Copilot wouldn't already do.</p>
-  <p><strong>Fix</strong>: hard rules, concrete vocabulary, explicit output contracts. Tell it what NOT to do.</p>
-  <blockquote>Diagnose by reading the agent's body aloud — would <em>you</em> know what to do?</blockquote>
-</section>
-
-<!-- 18 -->
-<section>
-  <h2>Good vs bad: prompts</h2>
-  <table>
-    <thead><tr><th class="good">✅ Good</th><th class="bad">❌ Bad</th></tr></thead>
-    <tbody>
-      <tr><td>One job: "analyze this log". Asks for the inputs it needs.</td><td>"Do all FEV things."</td></tr>
-      <tr><td>Delegates to an agent, doesn't redo its work.</td><td>Re-implements the skill inline.</td></tr>
-      <tr><td>Names the agent + skill it expects.</td><td>Hopes Copilot guesses.</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- 19 -->
-<section>
-  <h2>Build it live (10 minutes)</h2>
-<pre><code class="language-bash" data-trim>mkdir -p .github/{instructions,skills/fev-log-mini,agents,prompts,config}</code></pre>
-  <p>Then create the 5 files (copy from the earlier slides).</p>
-  <p><strong>Smoke tests:</strong></p>
-  <ol>
-    <li>Open chat → pick <strong>FEV-Lead</strong> → ask "what can you do?" → it should list <code>log-analyzer</code>.</li>
-    <li>Paste a fake log with <code>ERROR: abort</code> → it should route to <code>Log-Analyzer</code> and produce a timeline.</li>
-    <li>Type <code>/analyze-fev-log</code> → it should prompt for a path.</li>
-  </ol>
-  <p>If a smoke test fails, the <strong>description</strong> field of the relevant file is your prime suspect.</p>
-</section>
-
-<!-- 20 -->
-<section>
-  <h2>Why this matters in FEV</h2>
-  <p>FEV is <strong>vocabulary-heavy</strong>:</p>
-  <p>
-    <span class="pill">non-equivalent</span>
-    <span class="pill">abort</span>
-    <span class="pill">compare point</span>
-    <span class="pill">flatten_model</span>
-    <span class="pill">lec.log</span>
-    <span class="pill">fm.log</span>
-    <span class="pill">vsdc</span>
-    <span class="pill">svf</span>
-    <span class="pill">ivar</span>
-    <span class="pill">hook file</span>
-    <span class="pill">run-area</span>
-    <span class="pill">override layer</span>
-  </p>
-  <p>These carry exact meaning to us, but nothing to vanilla Copilot. <strong>30 lines</strong> of instructions changes Copilot from a generalist into a teammate.</p>
-  <blockquote>Every domain has its own vocabulary. The first agent you build for any new domain should always be an <code>*.instructions.md</code>.</blockquote>
-</section>
-
-<!-- 21 -->
-<section>
-  <h2>Recap</h2>
-  <ul>
-    <li>The <strong>5 primitives</strong> (instruction, skill, agent, sub-agent, prompt) — one job each.</li>
-    <li>The <strong>.github/</strong> folder layout Copilot auto-discovers.</li>
-    <li>They <strong>interlink via descriptions</strong>, not imports.</li>
-    <li>The two failure modes: <strong>overfit</strong> (too narrow) and <strong>underfit</strong> (too vague).</li>
-    <li>The pattern: <strong>prompt → master agent → sub-agent → skill → config data</strong>.</li>
-  </ul>
-  <h3>Your homework</h3>
-  <ol>
-    <li>Pick one pain you hit this week (a log, a script, a report).</li>
-    <li>Write a 30-line <code>*.instructions.md</code> for it.</li>
-    <li>Add ONE skill that does the recurring task.</li>
-    <li>Ship it as a PR. Iterate from there.</li>
-  </ol>
-  <p style="margin-top:1em;"><strong>Questions?</strong></p>
+<!-- 16 Do / Don't -->
+<section class="slide" data-title="Do / Don't">
+  <div class="topbar"><div class="kicker">Review rubric · from the authoring handbook</div><div class="page">16 / 16</div></div>
+  <div class="bento c2 grow">
+    <div class="card glowGreen" style="padding:14px 18px">
+      <h3>Do</h3>
+      <ul class="tightList">
+        <li>One <strong>vertical slice</strong> before a hierarchy.</li>
+        <li>One <strong>user-facing</strong> agent — hide everything else with <code>user-invocable: false</code>.</li>
+        <li><strong>Minimum tools</strong> per agent — add as real needs emerge.</li>
+        <li>Write descriptions: <strong>"Use when {trigger words}…"</strong></li>
+        <li>Co-locate skill assets next to the <code>SKILL.md</code> that uses them.</li>
+        <li>Externalize evolving data into <code>.github/config/*.yaml</code>.</li>
+        <li>Use <strong>"prefer / when / unless"</strong> for judgment guidance.</li>
+        <li>Keep <code>copilot-instructions.md</code> under <strong>100 lines</strong>.</li>
+        <li>Document MCPs in <code>AGENTS.md</code>; cite source fields verbatim.</li>
+      </ul>
+    </div>
+    <div class="card glowRose" style="padding:14px 18px">
+      <h3>Don't</h3>
+      <ul class="tightList">
+        <li>Don't ship both <code>AGENTS.md</code> and <code>copilot-instructions.md</code>.</li>
+        <li>Don't add <code>applyTo: '**'</code> to non-essential instructions.</li>
+        <li>Don't build <strong>swiss-army agents</strong> — 30 tools, vague description.</li>
+        <li>Don't write skills that are really prompts (no steps, no assets).</li>
+        <li>Don't write prompts that are really workflows (multi-turn, bundled).</li>
+        <li>Don't mismatch skill folder name and <code>name:</code> field — fails silently.</li>
+        <li>Don't create <strong>circular handoffs</strong> with no termination condition.</li>
+        <li>Don't grant <code>execute</code> or write-MCP to research-only agents.</li>
+        <li>Don't paraphrase tool results — quote HSD field / wiki URL.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note warn" style="margin-top:8px;padding:10px 16px"><p><strong>Two killer patterns:</strong>&ensp;<br><span class="rose"><strong>Overfit</strong></span> — agent hardcoded to one ward/block. Fix: inputs + YAML.&ensp;<br><span class="amber"><strong>Underfit</strong></span> — "you are a helpful FEV assistant." Fix: concrete nouns, hard rules, output contracts.</p></div>
+  <a class="repoLink" href="https://github.com/rkudipud/fev_agent_Exp" target="_blank">
+    <span class="chip mcp">Starter pack</span>
+    <span class="repoLinkLabel">Clone · experiment · adapt to your domain →</span>
+    <span class="repoLinkUrl">github.com/rkudipud/fev_agent_Exp</span>
+    <span class="repoLinkArrow">↗</span>
+  </a>
 </section>
 
 </div></div>
 
-<div class="footer">Agent Engineering 101 · use ← / → · press <kbd>F</kbd> for fullscreen, <kbd>S</kbd> for speaker view</div>
+<div class="navHot" id="navHot"></div>
+<div class="nav">
+  <div class="grp"><button class="btn" id="prevBtn" onclick="go(-1)">← Prev</button><button class="btn primary" id="nextBtn" onclick="go(1)">Next →</button></div>
+  <div class="dots" id="dots"></div>
+  <div class="grp"><button class="btn" onclick="scaleBy(-.1)">−</button><span class="scaleVal" id="scaleVal" onclick="resetScale()">100% text</span><button class="btn" onclick="scaleBy(.1)">+</button><span class="counter" id="counter">1 / 16</span><button class="btn" onclick="toggleFs()">⛶ Fullscreen</button></div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
 <script>
-  Reveal.initialize({
-    hash: true,
-    slideNumber: 'c/t',
-    transition: 'slide',
-    plugins: [ RevealHighlight, RevealNotes ],
+const slides = [...document.querySelectorAll('.slide')];
+const dots = document.getElementById('dots');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const deck = document.getElementById('deck');
+const stage = document.getElementById('stage');
+const scaleVal = document.getElementById('scaleVal');
+const root = document.documentElement;
+let index = 0;
+let uiScale = 1;
+
+slides.forEach((slide,i)=>{
+  const dot = document.createElement('button');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.title = `${i + 1}. ${slide.dataset.title || 'Slide'}`;
+  dot.setAttribute('aria-label', dot.title);
+  dot.onclick = () => show(i);
+  dots.appendChild(dot);
+});
+slides[0].classList.add('active');
+
+// Slides 5 & 7: click a [data-link] card to highlight matching [data-hl] line(s).
+document.querySelectorAll('[data-link]').forEach(card => {
+  card.addEventListener('click', () => {
+    const key = card.dataset.link;
+    const slide = card.closest('.slide');
+    if (!slide) return;
+    const wasLit = card.classList.contains('lit');
+    slide.querySelectorAll('[data-link].lit').forEach(c => c.classList.remove('lit'));
+    slide.querySelectorAll('.codePanel .lh.lit').forEach(s => s.classList.remove('lit'));
+    if (wasLit) return;
+    card.classList.add('lit');
+    slide.querySelectorAll(`.codePanel .lh[data-hl="${key}"]`).forEach(s => s.classList.add('lit'));
   });
+});
+
+function show(i){
+  if(i < 0 || i >= slides.length || i === index) return;
+  const prev = index;
+  const dir = i > prev ? 'inRight' : 'inLeft';
+  slides[prev].classList.remove('active','inRight','inLeft');
+  dots.children[prev].classList.remove('active');
+  index = i;
+  slides[index].classList.add('active');
+  void slides[index].offsetWidth;
+  slides[index].classList.add(dir);
+  slides[index].addEventListener('animationend',()=>slides[index].classList.remove('inRight','inLeft'),{once:true});
+  dots.children[index].classList.add('active');
+  counter.textContent = `${index + 1} / ${slides.length}`;
+  prevBtn.disabled = index === 0;
+  nextBtn.disabled = index === slides.length - 1;
+  stage.scrollTop = 0;
+}
+function go(delta){show(index + delta)}
+prevBtn.disabled = true;
+
+document.addEventListener('keydown',event=>{
+  if(event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' '){event.preventDefault();go(1)}
+  else if(event.key === 'ArrowLeft' || event.key === 'PageUp'){event.preventDefault();go(-1)}
+  else if(event.key === 'Home'){show(0)}
+  else if(event.key === 'End'){show(slides.length - 1)}
+  else if(event.key === 'f' || event.key === 'F'){toggleFs()}
+  else if(event.ctrlKey && (event.key === '=' || event.key === '+')){event.preventDefault();scaleBy(.1)}
+  else if(event.ctrlKey && event.key === '-'){event.preventDefault();scaleBy(-.1)}
+  else if(event.ctrlKey && event.key === '0'){event.preventDefault();resetScale()}
+});
+
+function fitDeck(){
+  const navH = document.body.classList.contains('fs') ? 0 : 56;
+  const fit = Math.min((window.innerWidth - 8) / 1440, (window.innerHeight - navH - 8) / 900);
+  deck.style.transform = `scale(${fit})`;
+  stage.style.paddingBottom = `${navH}px`;
+  scaleVal.textContent = `${Math.round(uiScale * 100)}% text`;
+}
+function viewportScaleFor(scale){return Math.max(.86,Math.min(1.14,1 - ((scale - 1) * .55)))}
+function applyReadability(){root.style.setProperty('--ui-scale',uiScale.toFixed(3));root.style.setProperty('--viewport-scale',viewportScaleFor(uiScale).toFixed(3))}
+function setScale(scale){uiScale = Math.max(.85,Math.min(1.35,scale));applyReadability();fitDeck()}
+function scaleBy(delta){setScale(uiScale + delta)}
+function resetScale(){setScale(1)}
+function toggleFs(){document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()}
+window.addEventListener('resize',fitDeck);
+document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('fs',!!document.fullscreenElement);fitDeck()});
+let navTimer;
+function flashNav(){document.body.classList.add('fsShow');clearTimeout(navTimer);navTimer=setTimeout(()=>document.body.classList.remove('fsShow'),1500)}
+document.getElementById('navHot').addEventListener('mouseenter',flashNav);
+document.addEventListener('mousemove',event=>{if(document.body.classList.contains('fs') && event.clientY > window.innerHeight - 80) flashNav()});
+fitDeck();
 </script>
 </body>
 </html>
